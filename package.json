@@ -1,0 +1,12 @@
+{
+  "name": "tpay-prototype",
+  "version": "1.0.0",
+  "description": "TPay - Mobile Fintech Wallet & Money Transfer Interactive Proposal Prototype",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["fintech", "wallet", "proposal", "prototype", "mobile"],
+  "author": "",
+  "license": "MIT"
+}
