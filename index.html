@@ -16,7 +16,7 @@
   <!-- ============================================================== -->
   <!-- 1. STAGE ONE: 100% FULLSCREEN SPLASH SCREEN                    -->
   <!-- ============================================================== -->
-  <section class="stage-screen" id="splashScreen">
+  <section class="stage-screen is-active-stage" id="splashScreen">
     <div class="splash-center-content">
       <div class="splash-logo-container">
         <img src="tpay_logo.png" alt="TPay Logo" class="brand-logo-img">
@@ -81,7 +81,7 @@
   <!-- ============================================================== -->
   <!-- 3. STAGE THREE: MAIN ACCOUNT DASHBOARD                         -->
   <!-- ============================================================== -->
-  <section class="stage-screen is-active-stage" id="dashboardScreen">
+  <section class="stage-screen" id="dashboardScreen">
 
     <!-- Clean Realistic Header (Reset, Replay, Lock buttons REMOVED) -->
     <header class="portal-header">
@@ -151,13 +151,6 @@
               <i data-lucide="send" style="width: 22px; height: 22px;"></i>
             </div>
             <span class="mobile-action-label">Send Money</span>
-          </button>
-
-          <button class="mobile-action-item" id="btnTriggerTopup">
-            <div class="mobile-action-circle topup-circle">
-              <i data-lucide="smartphone" style="width: 22px; height: 22px;"></i>
-            </div>
-            <span class="mobile-action-label">Mobile Top-Up</span>
           </button>
 
           <button class="mobile-action-item" id="btnTriggerRequest">

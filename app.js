@@ -48,7 +48,7 @@ class TPayPortal {
     this.balance = this.loadBalance();
     this.transactions = this.loadTransactions();
     this.enteredPin = "";
-    this.isBalanceHidden = false;
+    this.isBalanceHidden = true;
     this.splashDuration = 4500; // 4.5 seconds smooth splash
     this.splashTimer = null;
     this.selectedCarrier = "Jazz";
@@ -58,7 +58,7 @@ class TPayPortal {
     this.check24hAutoReplenish();
     this.updateBalanceDisplay();
     this.renderTransactions();
-    this.showScreen("dashboardScreen");
+    this.startSplashIntro();
 
     if (window.lucide) {
       lucide.createIcons();
