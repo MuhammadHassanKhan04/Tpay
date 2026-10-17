@@ -58,7 +58,7 @@ class TPayPortal {
     this.check24hAutoReplenish();
     this.updateBalanceDisplay();
     this.renderTransactions();
-    this.startSplashIntro();
+    this.showScreen("dashboardScreen");
 
     if (window.lucide) {
       lucide.createIcons();
@@ -281,7 +281,7 @@ class TPayPortal {
     });
 
     // Quick Send Amounts
-    document.querySelectorAll("#modalSendMoney [data-amt]").forEach(chip => {
+    document.querySelectorAll("#sendScreen [data-amt]").forEach(chip => {
       chip.addEventListener("click", () => {
         this.sendAmountField.value = chip.getAttribute("data-amt");
       });
@@ -347,8 +347,8 @@ class TPayPortal {
 
   // --- Strict Stage Switcher ---
   showScreen(screenId) {
-    [this.splashScreen, this.lockScreen, this.dashboardScreen].forEach(scr => {
-      if (scr) scr.classList.remove("is-active-stage");
+    document.querySelectorAll(".stage-screen").forEach(scr => {
+      scr.classList.remove("is-active-stage");
     });
     const target = document.getElementById(screenId);
     if (target) {
@@ -414,10 +414,13 @@ class TPayPortal {
 
   // --- Balance Display ---
   updateBalanceDisplay() {
+    const label = document.getElementById("balanceToggleLabel");
     if (this.isBalanceHidden) {
       this.dashBalanceDisplay.textContent = "••••••••";
+      if (label) label.textContent = "Show";
     } else {
       this.dashBalanceDisplay.textContent = this.formatCurrency(this.balance);
+      if (label) label.textContent = "Hide";
     }
   }
 

@@ -16,7 +16,7 @@
   <!-- ============================================================== -->
   <!-- 1. STAGE ONE: 100% FULLSCREEN SPLASH SCREEN                    -->
   <!-- ============================================================== -->
-  <section class="stage-screen is-active-stage" id="splashScreen">
+  <section class="stage-screen" id="splashScreen">
     <div class="splash-center-content">
       <div class="splash-logo-container">
         <img src="tpay_logo.png" alt="TPay Logo" class="brand-logo-img">
@@ -74,14 +74,14 @@
         </button>
       </div>
 
-      <p class="auth-pin-hint">Security Password: <strong>2009</strong></p>
+
     </div>
   </section>
 
   <!-- ============================================================== -->
   <!-- 3. STAGE THREE: MAIN ACCOUNT DASHBOARD                         -->
   <!-- ============================================================== -->
-  <section class="stage-screen" id="dashboardScreen">
+  <section class="stage-screen is-active-stage" id="dashboardScreen">
 
     <!-- Clean Realistic Header (Reset, Replay, Lock buttons REMOVED) -->
     <header class="portal-header">
@@ -119,7 +119,10 @@
 
           <div class="balance-heading-row">
             <span>Available Balance</span>
-            <i data-lucide="eye" id="btnEyeToggle" style="width: 16px; height: 16px; cursor: pointer;" title="Show/Hide Balance"></i>
+            <button class="btn-hide-balance" id="btnEyeToggle" title="Show/Hide Balance">
+              <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+              <span id="balanceToggleLabel">Hide</span>
+            </button>
           </div>
 
           <div class="balance-amount-row">

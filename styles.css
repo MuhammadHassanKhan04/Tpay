@@ -1342,3 +1342,229 @@ body {
     display: none !important;
   }
 }
+
+/* ================================================= */
+/* SEND MONEY STAGE SCREEN - MOBILE RESPONSIVE       */
+/* ================================================= */
+#sendScreen {
+  flex-direction: column;
+  background: #F8FAFC;
+  min-height: 100dvh;
+  min-height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.stage-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--primary-subtle);
+  color: var(--primary);
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-back:hover, .btn-back:active {
+  background: #BAE6FD;
+}
+
+.stage-content {
+  padding: 20px 16px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Form Items */
+.form-item-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.form-label-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border-light);
+  border-radius: 14px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: #FFFFFF;
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.custom-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+/* Chips / Badges */
+.chips-row-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #E0F2FE;
+  color: var(--primary-dark);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.quick-chip.active, .quick-chip:active {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary-dark);
+}
+
+.quick-chip:hover {
+  background: #BAE6FD;
+}
+
+/* Submit button */
+.btn-submit-sky {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35);
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+
+.btn-submit-sky:hover, .btn-submit-sky:active {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(2, 132, 199, 0.45);
+}
+
+/* Balance hide button */
+.btn-hide-balance {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 6px;
+}
+
+.btn-hide-balance:hover, .btn-hide-balance:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Make dashboard responsive */
+#dashboardScreen {
+  flex-direction: column;
+  min-height: 100dvh;
+  min-height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure lockScreen fills full height */
+#lockScreen {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100dvh;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--bg-main);
+}
+
+/* Mobile overrides */
+@media (max-width: 480px) {
+  .stage-content {
+    padding: 16px 12px 100px;
+    gap: 14px;
+  }
+  .stage-title {
+    font-size: 16px;
+  }
+  .btn-back {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+  .custom-input {
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+  .btn-submit-sky {
+    padding: 15px;
+    font-size: 15px;
+  }
+  .quick-chip {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+}
