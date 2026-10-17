@@ -1,7 +1,7 @@
 /**
- * TPay - Modern White & Sky Blue Fintech Web Portal
+ * TPay - Modern White & Sky Blue Fintech Portal
  * Strict Sequential Flow:
- * Phase 1: Pure Fullscreen Splash (5s) -> Phase 2: Pure Fullscreen Password (2009) -> Phase 3: Dashboard & Account
+ * Phase 1: Pure Fullscreen Splash -> Phase 2: Fullscreen Password (2009) -> Phase 3: Dashboard & Account
  * User: Hassan Khan | PIN: 2009 | Balance: 500k
  */
 
@@ -10,7 +10,15 @@ const REQUIRED_PIN = "2009";
 
 const INITIAL_TRANSACTIONS = [
   {
-    id: "TP-2026-90412",
+    id: "488274323",
+    title: "Transfer to TEMOOR SHAH",
+    type: "send",
+    amount: "-260.00",
+    date: "Today, 6:53 PM",
+    meta: "Easypaisa • Raast Instant"
+  },
+  {
+    id: "488192004",
     title: "Received from Raqmi Islamic Bank",
     type: "receive",
     amount: "+50,000.00",
@@ -18,7 +26,7 @@ const INITIAL_TRANSACTIONS = [
     meta: "Interbank Raqmi Transfer • UTR #88192"
   },
   {
-    id: "TP-2026-88319",
+    id: "488109231",
     title: "Al-Fatah Supermarket",
     type: "send",
     amount: "-6,450.00",
@@ -26,20 +34,12 @@ const INITIAL_TRANSACTIONS = [
     meta: "POS Merchant Payment"
   },
   {
-    id: "TP-2026-77102",
+    id: "487992019",
     title: "Jazz Super Card Extreme",
     type: "topup",
     amount: "-1,500.00",
     date: "15 Oct, 11:20 AM",
     meta: "Mobile Prepaid Recharge • 0300-8822009"
-  },
-  {
-    id: "TP-2026-66491",
-    title: "Client Retainer Payment",
-    type: "receive",
-    amount: "+150,000.00",
-    date: "12 Oct, 09:30 AM",
-    meta: "Inward Business Remittance"
   }
 ];
 
@@ -49,7 +49,7 @@ class TPayPortal {
     this.transactions = this.loadTransactions();
     this.enteredPin = "";
     this.isBalanceHidden = false;
-    this.splashDuration = 5000; // 5 seconds
+    this.splashDuration = 4500; // 4.5 seconds smooth splash
     this.splashTimer = null;
     this.selectedCarrier = "Jazz";
 
@@ -107,8 +107,6 @@ class TPayPortal {
 
     // Splash Elements
     this.splashFillBar = document.getElementById("splashFillBar");
-    this.splashTimerLabel = document.getElementById("splashTimerLabel");
-    this.btnSkipSplash = document.getElementById("btnSkipSplash");
 
     // PIN Elements
     this.pinDots = [
@@ -127,17 +125,19 @@ class TPayPortal {
     this.btnCardRefill500k = document.getElementById("btnCardRefill500k");
     this.activityFeedContainer = document.getElementById("activityFeedContainer");
     this.btnResetTxFeed = document.getElementById("btnResetTxFeed");
-
-    // Top Controls
-    this.btnTopResetBalance = document.getElementById("btnTopResetBalance");
-    this.btnTopReplaySplash = document.getElementById("btnTopReplaySplash");
-    this.btnTopLock = document.getElementById("btnTopLock");
+    this.btnUserProfile = document.getElementById("btnUserProfile");
+    this.btnNotifications = document.getElementById("btnNotifications");
 
     // Action Triggers
     this.btnTriggerSend = document.getElementById("btnTriggerSend");
     this.btnTriggerTopup = document.getElementById("btnTriggerTopup");
     this.btnTriggerRequest = document.getElementById("btnTriggerRequest");
     this.btnTriggerBills = document.getElementById("btnTriggerBills");
+
+    // Bottom Navigation
+    this.bottomNavSend = document.getElementById("bottomNavSend");
+    this.bottomNavCards = document.getElementById("bottomNavCards");
+    this.bottomNavProfile = document.getElementById("bottomNavProfile");
 
     // Modals
     this.modalSendMoney = document.getElementById("modalSendMoney");
@@ -157,53 +157,37 @@ class TPayPortal {
     this.btnExecuteTopup = document.getElementById("btnExecuteTopup");
     this.carrierCards = document.querySelectorAll(".carrier-card-item");
 
-    // Receipt Elements
+    // Ticket Receipt Elements (Raqmi style)
     this.receiptDispAmount = document.getElementById("receiptDispAmount");
-    this.receiptDispAmountWords = document.getElementById("receiptDispAmountWords");
+    this.receiptDispTime = document.getElementById("receiptDispTime");
     this.receiptDispRecipient = document.getElementById("receiptDispRecipient");
-    this.receiptDispBank = document.getElementById("receiptDispBank");
     this.receiptDispAccount = document.getElementById("receiptDispAccount");
     this.receiptDispRef = document.getElementById("receiptDispRef");
-    this.receiptDispTrace = document.getElementById("receiptDispTrace");
-    this.receiptDispTime = document.getElementById("receiptDispTime");
-    this.receiptDispPurpose = document.getElementById("receiptDispPurpose");
+    this.receiptDispChannel = document.getElementById("receiptDispChannel");
     this.btnPrintReceipt = document.getElementById("btnPrintReceipt");
-    this.btnShareReceipt = document.getElementById("btnShareReceipt");
     this.btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
   }
 
   // --- Event Handling ---
   bindEvents() {
-    // Splash
-    this.btnSkipSplash.addEventListener("click", () => this.finishSplash());
-
-    // Top controls (only in dashboard)
-    if (this.btnTopResetBalance) {
-      this.btnTopResetBalance.addEventListener("click", () => {
-        this.saveBalance(DEFAULT_BALANCE);
-        this.notify("Balance reset to ₨ 500,000.00 (Hassan Khan)");
-      });
-    }
-
+    // Quick Balance Refill inside debit card
     if (this.btnCardRefill500k) {
       this.btnCardRefill500k.addEventListener("click", () => {
         this.saveBalance(DEFAULT_BALANCE);
-        this.notify("Wallet replenished to ₨ 500,000.00");
+        this.notify("Wallet refilled to ₨ 500,000.00");
       });
     }
 
-    if (this.btnTopReplaySplash) {
-      this.btnTopReplaySplash.addEventListener("click", () => {
-        this.showScreen("splashScreen");
-        this.startSplashIntro();
+    // Profile & Notifications
+    if (this.btnUserProfile) {
+      this.btnUserProfile.addEventListener("click", () => {
+        this.notify("Hassan Khan • Account PK92 TPAY 8822 2009");
       });
     }
 
-    if (this.btnTopLock) {
-      this.btnTopLock.addEventListener("click", () => {
-        this.enteredPin = "";
-        this.updatePinDots();
-        this.showScreen("lockScreen");
+    if (this.btnNotifications) {
+      this.btnNotifications.addEventListener("click", () => {
+        this.notify("No new notifications");
       });
     }
 
@@ -232,12 +216,28 @@ class TPayPortal {
     this.btnResetTxFeed.addEventListener("click", () => {
       this.transactions = [...INITIAL_TRANSACTIONS];
       this.saveTransactions();
-      this.notify("Activity feed restored to default");
+      this.notify("Activity feed restored");
     });
 
     // Modal Triggers
     this.btnTriggerSend.addEventListener("click", () => this.openModal(this.modalSendMoney));
     this.btnTriggerTopup.addEventListener("click", () => this.openModal(this.modalTopup));
+
+    if (this.bottomNavSend) {
+      this.bottomNavSend.addEventListener("click", () => this.openModal(this.modalSendMoney));
+    }
+    if (this.bottomNavCards) {
+      this.bottomNavCards.addEventListener("click", () => {
+        this.notify("TPay Virtual Platinum Card: Active");
+      });
+    }
+    if (this.bottomNavProfile) {
+      this.bottomNavProfile.addEventListener("click", () => {
+        this.enteredPin = "";
+        this.updatePinDots();
+        this.showScreen("lockScreen");
+      });
+    }
 
     this.btnTriggerRequest.addEventListener("click", () => {
       this.notify("Payment link generated: tpay.me/hassan_khan");
@@ -255,12 +255,28 @@ class TPayPortal {
       });
     });
 
+    // Quick Bank Filter Badges
+    document.querySelectorAll("#quickBankBadges .quick-chip").forEach(badge => {
+      badge.addEventListener("click", () => {
+        document.querySelectorAll("#quickBankBadges .quick-chip").forEach(b => b.classList.remove("active"));
+        badge.classList.add("active");
+        const bankVal = badge.getAttribute("data-quickbank");
+        if (bankVal) {
+          this.sendDestinationBank.value = bankVal;
+        }
+      });
+    });
+
     // Quick Beneficiaries
     document.querySelectorAll("#contactsRow .quick-chip").forEach(chip => {
       chip.addEventListener("click", () => {
         const name = chip.getAttribute("data-name");
         const iban = chip.getAttribute("data-iban");
+        const bank = chip.getAttribute("data-bank");
         this.sendRecipientAccount.value = `${name} (${iban})`;
+        if (bank) {
+          this.sendDestinationBank.value = bank;
+        }
       });
     });
 
@@ -298,16 +314,6 @@ class TPayPortal {
       window.print();
     });
 
-    if (this.btnShareReceipt) {
-      this.btnShareReceipt.addEventListener("click", () => {
-        const ref = this.receiptDispRef.textContent;
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(`TPay Transaction Advice Ref: ${ref}`);
-        }
-        this.notify(`Transaction advice ${ref} copied!`);
-      });
-    }
-
     this.btnCloseReceiptModal.addEventListener("click", () => {
       this.closeModal(this.modalOfficialReceipt);
     });
@@ -318,17 +324,13 @@ class TPayPortal {
     if (this.splashTimer) clearInterval(this.splashTimer);
 
     let progress = 0;
-    const step = 50;
+    const step = 40;
     this.splashFillBar.style.width = "0%";
-    this.splashTimerLabel.textContent = "Initializing secure banking session... (5s)";
 
     this.splashTimer = setInterval(() => {
       progress += step;
       const pct = Math.min(100, (progress / this.splashDuration) * 100);
       this.splashFillBar.style.width = pct + "%";
-
-      const remainingSecs = Math.max(0, Math.ceil((this.splashDuration - progress) / 1000));
-      this.splashTimerLabel.textContent = `Initializing secure banking session... (${remainingSecs}s)`;
 
       if (progress >= this.splashDuration) {
         clearInterval(this.splashTimer);
@@ -392,7 +394,7 @@ class TPayPortal {
 
   shakePinError() {
     this.pinDots.forEach(dot => dot.classList.add("is-error"));
-    this.notify("Incorrect Password! Enter '2009'");
+    this.notify("Incorrect PIN! Enter '2009'");
     setTimeout(() => {
       this.enteredPin = "";
       this.updatePinDots();
@@ -473,7 +475,7 @@ class TPayPortal {
     const purpose = this.sendPurposeSelect.value;
 
     if (!recipient) {
-      alert("Please specify a recipient name, IBAN, or mobile number.");
+      alert("Please specify a recipient name, account number, or IBAN.");
       return;
     }
     if (!amount || amount <= 0) {
@@ -481,12 +483,12 @@ class TPayPortal {
       return;
     }
     if (amount > this.balance) {
-      alert("Insufficient available balance in your wallet.");
+      alert("Insufficient available balance.");
       return;
     }
 
     this.btnExecuteSend.disabled = true;
-    this.btnExecuteSend.innerHTML = `<span>Processing Interbank Transfer...</span>`;
+    this.btnExecuteSend.innerHTML = `<span>Processing via Raast...</span>`;
 
     setTimeout(() => {
       this.btnExecuteSend.disabled = false;
@@ -496,18 +498,42 @@ class TPayPortal {
       const newBal = this.balance - amount;
       this.saveBalance(newBal);
 
-      // Unique UTR Reference
-      const refId = "TP-" + new Date().getFullYear() + "-" + Math.floor(100000 + Math.random() * 900000);
-      const recipientName = recipient.includes("(") ? recipient.split("(")[0].trim() : recipient;
+      // Clean name and last 4 digits
+      let cleanRecipient = recipient;
+      let last4 = "*" + Math.floor(1000 + Math.random() * 9000);
+      if (recipient.includes("(") && recipient.includes(")")) {
+        cleanRecipient = recipient.split("(")[0].trim();
+        const acct = recipient.split("(")[1].replace(")", "").trim();
+        last4 = "*" + acct.slice(-4);
+      } else if (recipient.length >= 4) {
+        last4 = "*" + recipient.slice(-4);
+      }
+
+      // 9-digit Raast Transaction ID (like 488274323 in user reference image)
+      const refId = Math.floor(400000000 + Math.random() * 590000000).toString();
+
+      // Format date like: "Sent at 6:53 PM on 17 Oct 26"
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      const day = now.getDate();
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[now.getMonth()];
+      const year = now.getFullYear().toString().slice(-2);
+      const formattedTimestamp = `Sent at ${hours}:${minutes} ${ampm} on ${day} ${month} ${year}`;
 
       // Add to feed
       const newTx = {
         id: refId,
-        title: `Transfer to ${recipientName}`,
+        title: `Transfer to ${cleanRecipient.toUpperCase()}`,
         type: "send",
         amount: `-${this.formatCurrency(amount)}`,
         date: "Just now",
-        meta: `${bank} • ${purpose}`
+        meta: `${bank} • Raast Instant`
       };
       this.transactions.unshift(newTx);
       this.saveTransactions();
@@ -517,25 +543,15 @@ class TPayPortal {
       this.sendAmountField.value = "";
       this.closeModal(this.modalSendMoney);
 
-      // Extract clean name and account
-      let cleanRecipient = recipient;
-      let cleanAccount = "PK" + Math.floor(10 + Math.random() * 89) + " " + bank.slice(0, 4).toUpperCase() + " " + Math.floor(1000 + Math.random() * 9000) + " " + Math.floor(1000 + Math.random() * 9000);
-      if (recipient.includes("(") && recipient.includes(")")) {
-        cleanRecipient = recipient.split("(")[0].trim();
-        cleanAccount = recipient.split("(")[1].replace(")", "").trim();
-      }
-
-      // Show Official Professional Receipt Advice
+      // Show Exact Replica Ticket Receipt
       this.showReceiptModal({
-        amount: `₨ ${this.formatCurrency(amount)}`,
-        rawAmount: amount,
-        recipient: cleanRecipient,
-        account: cleanAccount,
+        amountStr: `Rs. ${this.formatCurrency(amount).replace('.00', '')}`,
+        timestamp: formattedTimestamp,
+        recipient: cleanRecipient.toUpperCase(),
+        accountMask: last4,
         bank: bank,
         ref: refId,
-        trace: "RAAST-PK-" + Math.floor(10000000 + Math.random() * 90000000),
-        purpose: purpose,
-        time: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ", " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " PKT"
+        channel: "Raast"
       });
     }, 900);
   }
@@ -568,7 +584,20 @@ class TPayPortal {
       const newBal = this.balance - amount;
       this.saveBalance(newBal);
 
-      const refId = "TU-" + new Date().getFullYear() + "-" + Math.floor(100000 + Math.random() * 900000);
+      const refId = Math.floor(400000000 + Math.random() * 590000000).toString();
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      const day = now.getDate();
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[now.getMonth()];
+      const year = now.getFullYear().toString().slice(-2);
+      const formattedTimestamp = `Sent at ${hours}:${minutes} ${ampm} on ${day} ${month} ${year}`;
+
       const newTx = {
         id: refId,
         title: `${this.selectedCarrier} Mobile Top-Up`,
@@ -585,56 +614,25 @@ class TPayPortal {
       this.closeModal(this.modalTopup);
 
       this.showReceiptModal({
-        amount: `₨ ${this.formatCurrency(amount)}`,
-        rawAmount: amount,
-        recipient: phone,
-        account: phone + " (Prepaid SIM)",
-        bank: `${this.selectedCarrier} Telecom Network`,
+        amountStr: `Rs. ${this.formatCurrency(amount).replace('.00', '')}`,
+        timestamp: formattedTimestamp,
+        recipient: `${this.selectedCarrier} (${phone})`,
+        accountMask: "*" + phone.slice(-4),
+        bank: `${this.selectedCarrier} Telecom`,
         ref: refId,
-        trace: "1LINK-TEL-" + Math.floor(10000000 + Math.random() * 90000000),
-        purpose: "Mobile Airtime / Bundle Recharge",
-        time: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ", " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " PKT"
+        channel: "Direct Airtime"
       });
     }, 900);
   }
 
-  // --- Amount to Words Converter ---
-  amountToWords(num) {
-    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    
-    function convert(n) {
-      if (n === 0) return '';
-      if (n < 20) return ones[n] + ' ';
-      if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? '-' + ones[n % 10] : '') + ' ';
-      if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred ' + convert(n % 100);
-      if (n < 100000) return convert(Math.floor(n / 1000)) + 'Thousand ' + convert(n % 1000);
-      if (n < 10000000) return convert(Math.floor(n / 100000)) + 'Lakh ' + convert(n % 100000);
-      return n.toString() + ' ';
-    }
-
-    const intPart = Math.floor(num);
-    const words = convert(intPart).trim();
-    return words ? `PKR ${words} Only` : 'PKR Zero Only';
-  }
-
-  // --- Show Professional Receipt ---
+  // --- Show Exact Ticket Receipt ---
   showReceiptModal(data) {
-    this.receiptDispAmount.textContent = data.amount;
-    if (this.receiptDispAmountWords) {
-      this.receiptDispAmountWords.textContent = this.amountToWords(data.rawAmount || 0);
-    }
+    this.receiptDispAmount.textContent = data.amountStr;
+    this.receiptDispTime.textContent = data.timestamp;
     this.receiptDispRecipient.textContent = data.recipient;
-    if (this.receiptDispAccount) {
-      this.receiptDispAccount.textContent = data.account;
-    }
-    this.receiptDispBank.textContent = data.bank;
+    this.receiptDispAccount.textContent = data.accountMask;
     this.receiptDispRef.textContent = data.ref;
-    if (this.receiptDispTrace) {
-      this.receiptDispTrace.textContent = data.trace;
-    }
-    this.receiptDispTime.textContent = data.time;
-    this.receiptDispPurpose.textContent = data.purpose;
+    this.receiptDispChannel.textContent = data.channel;
 
     this.openModal(this.modalOfficialReceipt);
   }
@@ -655,17 +653,17 @@ class TPayPortal {
       toast = document.createElement("div");
       toast.id = "skyToast";
       toast.style.position = "fixed";
-      toast.style.bottom = "28px";
+      toast.style.bottom = "74px";
       toast.style.left = "50%";
       toast.style.transform = "translateX(-50%)";
-      toast.style.background = "#0284C7";
+      toast.style.background = "#0F172A";
       toast.style.color = "#FFFFFF";
-      toast.style.padding = "10px 24px";
+      toast.style.padding = "10px 22px";
       toast.style.borderRadius = "30px";
       toast.style.fontSize = "13px";
       toast.style.fontWeight = "700";
       toast.style.zIndex = "9999999";
-      toast.style.boxShadow = "0 8px 24px rgba(2, 132, 199, 0.35)";
+      toast.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.3)";
       toast.style.transition = "opacity 0.3s ease";
       document.body.appendChild(toast);
     }

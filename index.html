@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0284C7">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>TPay - Modern Digital Banking</title>
+  <title>TPay - Mobile Digital Banking</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -14,34 +14,36 @@
 <body>
 
   <!-- ============================================================== -->
-  <!-- 1. STAGE ONE: 100% FULLSCREEN SPLASH SCREEN (NO HEADER)        -->
+  <!-- 1. STAGE ONE: 100% FULLSCREEN SPLASH SCREEN                    -->
   <!-- ============================================================== -->
   <section class="stage-screen is-active-stage" id="splashScreen">
     <div class="splash-center-content">
-      <div class="splash-brand-icon">T</div>
-      <h1 class="splash-main-title">T<span>Pay</span></h1>
+      <div class="splash-logo-container">
+        <img src="tpay_logo.png" alt="TPay Logo" class="brand-logo-img">
+      </div>
       <p class="splash-tagline">Next-Gen Digital Banking & Mobile Wallet</p>
 
       <div class="splash-progress-track">
         <div class="splash-progress-fill" id="splashFillBar"></div>
       </div>
-      <span class="splash-counter-text" id="splashTimerLabel">Initializing secure session... (5s)</span>
-
-      <button class="btn-skip-intro" id="btnSkipSplash">Skip Intro →</button>
     </div>
   </section>
 
   <!-- ============================================================== -->
-  <!-- 2. STAGE TWO: 100% FULLSCREEN PASSWORD SCREEN (NO HEADER)      -->
+  <!-- 2. STAGE TWO: 100% FULLSCREEN PASSWORD SCREEN                  -->
   <!-- ============================================================== -->
   <section class="stage-screen" id="lockScreen">
     <div class="auth-modal-card">
+      <div class="auth-logo-wrap">
+        <img src="tpay_logo.png" alt="TPay" class="auth-logo-img">
+      </div>
+
       <div class="auth-avatar-circle">HK</div>
       <h2 class="auth-greeting-name">Hassan Khan</h2>
       <span class="auth-account-pill">Account: PK92 TPAY 8822 2009</span>
 
       <p class="auth-subtitle-text">
-        Enter your 4-digit security PIN to access your account
+        Enter your 4-digit security PIN
       </p>
 
       <!-- PIN Bubbles -->
@@ -72,161 +74,150 @@
         </button>
       </div>
 
-      <p class="auth-pin-hint">Security Password: <strong>2009</strong> (or tap Face ID)</p>
+      <p class="auth-pin-hint">Security Password: <strong>2009</strong></p>
     </div>
   </section>
 
   <!-- ============================================================== -->
-  <!-- 3. STAGE THREE: MAIN ACCOUNT PAGE (HEADER APPEARS HERE ONLY)   -->
+  <!-- 3. STAGE THREE: MAIN ACCOUNT DASHBOARD                         -->
   <!-- ============================================================== -->
   <section class="stage-screen" id="dashboardScreen">
 
-    <!-- Top Navigation Header (Only visible on dashboard) -->
+    <!-- Clean Realistic Header (Reset, Replay, Lock buttons REMOVED) -->
     <header class="portal-header">
       <div class="portal-nav-inner">
         <div class="portal-brand">
-          <div class="portal-logo-square">T</div>
-          <div>
-            <div class="portal-brand-text">T<span>Pay</span></div>
-            <div class="portal-subtitle">Digital Banking</div>
-          </div>
+          <img src="tpay_logo.png" alt="TPay" class="header-logo-img">
         </div>
 
         <div class="header-user-controls">
-          <div class="header-user-badge" title="Hassan Khan">
+          <div class="header-user-badge" id="btnUserProfile" title="Hassan Khan">
             <div class="header-avatar">HK</div>
             <span class="header-name">Hassan Khan</span>
           </div>
 
-          <button class="btn-portal-action" id="btnTopResetBalance" title="Reset balance to 500k">
-            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
-            <span class="btn-label-text">Reset 500K</span>
-          </button>
-          <button class="btn-portal-action" id="btnTopReplaySplash" title="Replay 5s Splash intro">
-            <i data-lucide="play" style="width: 14px; height: 14px;"></i>
-            <span class="btn-label-text">Replay</span>
-          </button>
-          <button class="btn-portal-action" id="btnTopLock" title="Lock Wallet">
-            <i data-lucide="lock" style="width: 14px; height: 14px;"></i>
-            <span class="btn-label-text">Lock</span>
+          <button class="header-icon-btn" id="btnNotifications" title="Notifications">
+            <i data-lucide="bell" style="width: 19px; height: 19px;"></i>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- Main Account Dashboard Body -->
+    <!-- Mobile-First Main Dashboard Body -->
     <main class="portal-main-body">
-      <div class="dashboard-layout-grid">
+      <div class="mobile-app-shell">
 
-        <!-- Left Stack: Balance & Actions -->
-        <div class="portal-left-stack">
+        <!-- Sky Blue Balance Card -->
+        <div class="sky-debit-card">
+          <div class="card-top-row">
+            <div class="card-bank-label">
+              <i data-lucide="credit-card" style="width: 18px; height: 18px;"></i>
+              <span>TPay Virtual Platinum</span>
+            </div>
+            <span class="card-tier-pill">Active</span>
+          </div>
+
+          <div class="balance-heading-row">
+            <span>Available Balance</span>
+            <i data-lucide="eye" id="btnEyeToggle" style="width: 16px; height: 16px; cursor: pointer;" title="Show/Hide Balance"></i>
+          </div>
+
+          <div class="balance-amount-row">
+            <span class="balance-curr">PKR</span>
+            <span class="balance-val" id="dashBalanceDisplay">500,000.00</span>
+          </div>
+
+          <div class="card-footer-meta">
+            <div class="card-meta-left">
+              <div class="card-holder-tag">Card Holder</div>
+              <div class="card-holder-name">Hassan Khan</div>
+              <div class="card-iban-mono">PK92 TPAY 8822 2009 5410</div>
+            </div>
+
+            <button class="btn-card-quick-500k" id="btnCardRefill500k" title="Refill Balance">
+              <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i>
+              <span>Refill 500k</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4-Icon Mobile Banking Action Row -->
+        <div class="mobile-action-bar-row">
           
-          <!-- Sky Blue Balance Card -->
-          <div class="sky-debit-card">
-            <div class="card-top-row">
-              <div class="card-bank-label">
-                <i data-lucide="credit-card" style="width: 18px; height: 18px;"></i>
-                <span>TPay Virtual Platinum</span>
-              </div>
-              <span class="card-tier-pill">Active</span>
+          <button class="mobile-action-item" id="btnTriggerSend">
+            <div class="mobile-action-circle send-circle">
+              <i data-lucide="send" style="width: 22px; height: 22px;"></i>
             </div>
+            <span class="mobile-action-label">Send Money</span>
+          </button>
 
-            <div class="balance-heading-row">
-              <span>Available Balance</span>
-              <i data-lucide="eye" id="btnEyeToggle" style="width: 16px; height: 16px; cursor: pointer;" title="Show/Hide Balance"></i>
+          <button class="mobile-action-item" id="btnTriggerTopup">
+            <div class="mobile-action-circle topup-circle">
+              <i data-lucide="smartphone" style="width: 22px; height: 22px;"></i>
             </div>
+            <span class="mobile-action-label">Mobile Top-Up</span>
+          </button>
 
-            <div class="balance-amount-row">
-              <span class="balance-curr">PKR</span>
-              <span class="balance-val" id="dashBalanceDisplay">500,000.00</span>
+          <button class="mobile-action-item" id="btnTriggerRequest">
+            <div class="mobile-action-circle request-circle">
+              <i data-lucide="arrow-down-left" style="width: 22px; height: 22px;"></i>
             </div>
+            <span class="mobile-action-label">Request</span>
+          </button>
 
-            <div class="card-footer-meta">
-              <div class="card-meta-left">
-                <div class="card-holder-tag">Card Holder</div>
-                <div class="card-holder-name">Hassan Khan</div>
-                <div class="card-iban-mono">PK92 TPAY 8822 2009 5410</div>
-              </div>
-
-              <button class="btn-card-quick-500k" id="btnCardRefill500k">
-                <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i>
-                <span>Refill 500k</span>
-              </button>
+          <button class="mobile-action-item" id="btnTriggerBills">
+            <div class="mobile-action-circle bills-circle">
+              <i data-lucide="receipt" style="width: 22px; height: 22px;"></i>
             </div>
-          </div>
-
-          <!-- Quick Service Buttons -->
-          <div class="service-cards-row">
-            
-            <div class="service-card-button" id="btnTriggerSend">
-              <div class="service-icon-box">
-                <i data-lucide="send" style="width: 22px; height: 22px;"></i>
-              </div>
-              <div class="service-details">
-                <h4>Send Money</h4>
-                <p>To Bank or Mobile Wallet</p>
-              </div>
-            </div>
-
-            <div class="service-card-button" id="btnTriggerTopup">
-              <div class="service-icon-box">
-                <i data-lucide="smartphone" style="width: 22px; height: 22px;"></i>
-              </div>
-              <div class="service-details">
-                <h4>Mobile Top-Up</h4>
-                <p>Jazz, Zong, Telenor, Ufone</p>
-              </div>
-            </div>
-
-            <div class="service-card-button" id="btnTriggerRequest">
-              <div class="service-icon-box">
-                <i data-lucide="arrow-down-left" style="width: 22px; height: 22px;"></i>
-              </div>
-              <div class="service-details">
-                <h4>Request Money</h4>
-                <p>Instant Payment Link</p>
-              </div>
-            </div>
-
-            <div class="service-card-button" id="btnTriggerBills">
-              <div class="service-icon-box">
-                <i data-lucide="receipt" style="width: 22px; height: 22px;"></i>
-              </div>
-              <div class="service-details">
-                <h4>Bill Payments</h4>
-                <p>LESCO, SSGC, PTCL</p>
-              </div>
-            </div>
-
-          </div>
+            <span class="mobile-action-label">Bill Pay</span>
+          </button>
 
         </div>
 
-        <!-- Right Stack: Activity & Info -->
-        <div class="portal-right-stack">
-          <div class="white-activity-card">
-            <div class="activity-header">
-              <h3 class="activity-title">Recent Transactions</h3>
-              <span class="activity-reset-link" id="btnResetTxFeed">Reset Feed</span>
-            </div>
-
-            <div class="activity-items-stack" id="activityFeedContainer">
-              <!-- Dynamically populated -->
-            </div>
+        <!-- Recent Activity Feed Card -->
+        <div class="white-activity-card">
+          <div class="activity-header">
+            <h3 class="activity-title">Recent Transactions</h3>
+            <span class="activity-reset-link" id="btnResetTxFeed">Reset</span>
           </div>
 
-          <div class="proposal-concept-pill">
-            🔒 TPay Digital Banking • Official Presentation Prototype
+          <div class="activity-items-stack" id="activityFeedContainer">
+            <!-- Dynamically populated -->
           </div>
+        </div>
+
+        <!-- Proposal Watermark -->
+        <div class="proposal-concept-pill">
+          🔒 TPay Digital Banking • Raqmi Core v2.6
         </div>
 
       </div>
     </main>
 
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <button class="bottom-nav-tab active">
+        <i data-lucide="home"></i>
+        <span>Home</span>
+      </button>
+      <button class="bottom-nav-tab" id="bottomNavSend">
+        <i data-lucide="repeat"></i>
+        <span>Transfer</span>
+      </button>
+      <button class="bottom-nav-tab" id="bottomNavCards">
+        <i data-lucide="credit-card"></i>
+        <span>Cards</span>
+      </button>
+      <button class="bottom-nav-tab" id="bottomNavProfile">
+        <i data-lucide="user"></i>
+        <span>Profile</span>
+      </button>
+    </nav>
+
   </section>
 
   <!-- ============================================================== -->
-  <!-- MODALS (Full Mobile Bottom-Sheet Responsive)                   -->
+  <!-- MODALS                                                         -->
   <!-- ============================================================== -->
 
   <!-- 1. Send Money Modal -->
@@ -240,33 +231,66 @@
         </button>
       </div>
 
-      <!-- Bank Selector -->
+      <!-- Quick Bank Filter Badges -->
       <div class="form-item-wrap">
-        <label class="form-label-title" for="sendDestinationBank">Destination Bank / Wallet</label>
+        <label class="form-label-title">Quick Destination</label>
+        <div class="chips-row-wrap" id="quickBankBadges">
+          <span class="quick-chip active" data-quickbank="Easypaisa">Easypaisa</span>
+          <span class="quick-chip" data-quickbank="JazzCash">JazzCash</span>
+          <span class="quick-chip" data-quickbank="Raqmi Islamic Digital Bank">Raqmi Bank</span>
+          <span class="quick-chip" data-quickbank="SadaPay">SadaPay</span>
+          <span class="quick-chip" data-quickbank="Meezan Bank">Meezan Bank</span>
+          <span class="quick-chip" data-quickbank="Habib Bank Limited (HBL)">HBL</span>
+        </div>
+      </div>
+
+      <!-- Comprehensive Destination Bank / Wallet Selector -->
+      <div class="form-item-wrap">
+        <label class="form-label-title" for="sendDestinationBank">Select Bank or Mobile Wallet</label>
         <select id="sendDestinationBank" class="custom-input">
-          <option value="Raqmi Islamic Digital Bank">Raqmi Digital Bank</option>
-          <option value="TPay Internal Wallet">TPay Wallet (Instant)</option>
-          <option value="Habib Bank Limited (HBL)">Habib Bank Limited (HBL)</option>
-          <option value="Meezan Bank">Meezan Bank</option>
-          <option value="JazzCash">JazzCash Wallet</option>
-          <option value="Easypaisa">Easypaisa Wallet</option>
+          <optgroup label="Mobile Wallets & Microfinance Banks">
+            <option value="Easypaisa" selected>Easypaisa (Telenor Microfinance Bank)</option>
+            <option value="JazzCash">JazzCash (Mobilink Microfinance Bank)</option>
+            <option value="Raqmi Islamic Digital Bank">Raqmi Islamic Digital Bank</option>
+            <option value="SadaPay">SadaPay</option>
+            <option value="NayaPay">NayaPay</option>
+            <option value="TPay Internal Wallet">TPay Wallet (Instant)</option>
+            <option value="U Microfinance Bank (UPaisa)">UPaisa (U Microfinance Bank)</option>
+          </optgroup>
+          <optgroup label="Major Commercial & Islamic Banks">
+            <option value="Meezan Bank">Meezan Bank Limited</option>
+            <option value="Habib Bank Limited (HBL)">Habib Bank Limited (HBL)</option>
+            <option value="Bank Alfalah">Bank Alfalah</option>
+            <option value="United Bank Limited (UBL)">United Bank Limited (UBL)</option>
+            <option value="MCB Bank Limited">MCB Bank Limited</option>
+            <option value="Allied Bank Limited (ABL)">Allied Bank Limited (ABL)</option>
+            <option value="Faysal Bank">Faysal Bank Limited</option>
+            <option value="Standard Chartered Bank">Standard Chartered Bank Pakistan</option>
+            <option value="Bank of Punjab (BOP)">Bank of Punjab (BOP)</option>
+            <option value="Askari Bank">Askari Bank Limited</option>
+            <option value="BankIslami">BankIslami Pakistan Limited</option>
+            <option value="JS Bank">JS Bank</option>
+            <option value="Soneri Bank">Soneri Bank</option>
+            <option value="Dubai Islamic Bank">Dubai Islamic Bank (DIB)</option>
+            <option value="Al Baraka Bank">Al Baraka Bank</option>
+          </optgroup>
         </select>
       </div>
 
       <!-- Quick Beneficiaries -->
       <div class="form-item-wrap">
-        <label class="form-label-title">Quick Beneficiary</label>
+        <label class="form-label-title">Recent Beneficiaries</label>
         <div class="chips-row-wrap" id="contactsRow">
-          <span class="quick-chip" data-name="Ahmed Raza" data-iban="PK54 RAQM 0019 9921">Ahmed Raza</span>
-          <span class="quick-chip" data-name="Fatima Noor" data-iban="PK92 MEZN 0021 4455">Fatima Noor</span>
-          <span class="quick-chip" data-name="Zubair Malik" data-iban="0301-8899112">Zubair Malik</span>
+          <span class="quick-chip" data-name="TEMOOR SHAH" data-iban="0300-8822054" data-bank="Easypaisa">TEMOOR SHAH (Easypaisa)</span>
+          <span class="quick-chip" data-name="Ahmed Raza" data-iban="0312-9988441" data-bank="JazzCash">Ahmed Raza (JazzCash)</span>
+          <span class="quick-chip" data-name="Fatima Noor" data-iban="PK92 MEZN 0021 4455" data-bank="Meezan Bank">Fatima Noor (Meezan)</span>
         </div>
       </div>
 
       <!-- Recipient Account -->
       <div class="form-item-wrap">
-        <label class="form-label-title" for="sendRecipientAccount">Account Number / IBAN</label>
-        <input type="text" id="sendRecipientAccount" class="custom-input" placeholder="Enter IBAN or Mobile Account Number">
+        <label class="form-label-title" for="sendRecipientAccount">Recipient Account / Mobile Number / IBAN</label>
+        <input type="text" id="sendRecipientAccount" class="custom-input" placeholder="e.g. 0300 1234567 or IBAN">
       </div>
 
       <!-- Amount -->
@@ -274,8 +298,9 @@
         <label class="form-label-title" for="sendAmountField">Transfer Amount (PKR)</label>
         <input type="number" id="sendAmountField" class="custom-input" placeholder="0.00" min="10">
         <div class="chips-row-wrap">
-          <span class="quick-chip" data-amt="2000">₨ 2,000</span>
-          <span class="quick-chip" data-amt="10000">₨ 10,000</span>
+          <span class="quick-chip" data-amt="260">₨ 260</span>
+          <span class="quick-chip" data-amt="1000">₨ 1,000</span>
+          <span class="quick-chip" data-amt="5000">₨ 5,000</span>
           <span class="quick-chip" data-amt="25000">₨ 25,000</span>
           <span class="quick-chip" data-amt="50000">₨ 50,000</span>
         </div>
@@ -355,160 +380,120 @@
     </div>
   </div>
 
-  <!-- 3. PROFESSIONAL TRANSACTION RECEIPT MODAL -->
+  <!-- ============================================================== -->
+  <!-- 3. EXACT REALISTIC RAQAMI / RAAST TICKET RECEIPT MODAL         -->
+  <!-- ============================================================== -->
   <div class="modal-backdrop-layer" id="modalOfficialReceipt">
-    <div class="modal-content-box" style="max-width: 580px;">
+    <div class="modal-content-box receipt-modal-box">
       <div class="modal-mobile-handle"></div>
-      
-      <!-- Realistic Bank Transaction Advice -->
-      <div class="bank-receipt-box" id="officialVoucher">
+
+      <!-- Exact Replica of User's Ticket Receipt -->
+      <div class="ticket-receipt-card" id="officialVoucher">
         
-        <!-- Header -->
-        <div class="receipt-header-row">
-          <div class="receipt-brand-group">
-            <div class="receipt-icon-t">T</div>
-            <div>
-              <div class="receipt-bank-title">TPay Digital Bank Ltd.</div>
-              <div class="receipt-bank-sub">Electronic Funds Transfer (IBFT / RAAST) Advice</div>
-              <div class="receipt-license-tag">Licensed Islamic Digital Bank • Member 1LINK & RAAST</div>
-            </div>
-          </div>
-          <div class="receipt-status-pill">
-            <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i>
-            <span>COMPLETED</span>
-          </div>
-        </div>
-
-        <!-- Hero Amount Box -->
-        <div class="receipt-hero-amount-card">
-          <div class="receipt-amount-sublabel">Total Transferred Amount</div>
-          <div class="receipt-amount-large" id="receiptDispAmount">₨ 0.00</div>
-          <div class="receipt-amount-words" id="receiptDispAmountWords">PKR Zero Only</div>
-        </div>
-
-        <!-- Sender & Beneficiary 2-Column Split -->
-        <div class="receipt-parties-grid">
-          
-          <!-- Sender (From) -->
-          <div class="party-info-box">
-            <div class="party-header-badge">
-              <i data-lucide="arrow-up-right" style="width: 12px; height: 12px;"></i>
-              <span>FROM (SENDER)</span>
-            </div>
-            <div class="party-name">Hassan Khan</div>
-            <div class="party-bank">TPay Digital Bank</div>
-            <div class="party-account-mono">PK92 TPAY 8822 2009 5410</div>
-          </div>
-
-          <!-- Beneficiary (To) -->
-          <div class="party-info-box">
-            <div class="party-header-badge beneficiary">
-              <i data-lucide="arrow-down-left" style="width: 12px; height: 12px;"></i>
-              <span>TO (BENEFICIARY)</span>
-            </div>
-            <div class="party-name" id="receiptDispRecipient">Ahmed Raza</div>
-            <div class="party-bank" id="receiptDispBank">Raqmi Digital Bank</div>
-            <div class="party-account-mono" id="receiptDispAccount">PK54 RAQM 0019 9921</div>
-          </div>
-
-        </div>
-
-        <!-- Transaction Audit Details Table -->
-        <div class="receipt-audit-table">
-          <div class="receipt-audit-row">
-            <span class="audit-label">Transaction Type</span>
-            <span class="audit-value">Interbank Funds Transfer (IBFT / RAAST)</span>
-          </div>
-          <div class="receipt-audit-row">
-            <span class="audit-label">Reference No (STAN/UTR)</span>
-            <span class="audit-value-mono" id="receiptDispRef">TPAY-2026-8991204</span>
-          </div>
-          <div class="receipt-audit-row">
-            <span class="audit-label">1LINK / RAAST Trace ID</span>
-            <span class="audit-value-mono" id="receiptDispTrace">RAAST-PK-77492104</span>
-          </div>
-          <div class="receipt-audit-row">
-            <span class="audit-label">Date & Time</span>
-            <span class="audit-value" id="receiptDispTime">17-Oct-2026, 10:15:30 PM PKT</span>
-          </div>
-          <div class="receipt-audit-row">
-            <span class="audit-label">Purpose of Remittance</span>
-            <span class="audit-value" id="receiptDispPurpose">Family / Personal Transfer</span>
-          </div>
-          <div class="receipt-audit-row">
-            <span class="audit-label">Transfer Fee (1LINK / RAAST)</span>
-            <span class="audit-value" style="color: #059669; font-weight: 700;">PKR 0.00 (Zero Fee)</span>
-          </div>
-          <div class="receipt-audit-row">
-            <span class="audit-label">Federal Excise Duty (FED)</span>
-            <span class="audit-value" style="color: #059669; font-weight: 700;">PKR 0.00</span>
-          </div>
-        </div>
-
-        <!-- Security & QR Verification Footer -->
-        <div class="receipt-security-footer">
-          <div class="qr-code-box">
-            <!-- Authentic Vector SVG QR Code -->
-            <svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="100" height="100" fill="#FFFFFF"/>
-              <!-- Top Left Finder -->
-              <rect x="10" y="10" width="26" height="26" rx="4" fill="#0284C7"/>
-              <rect x="15" y="15" width="16" height="16" rx="2" fill="#FFFFFF"/>
-              <rect x="18" y="18" width="10" height="10" rx="1" fill="#0284C7"/>
-              <!-- Top Right Finder -->
-              <rect x="64" y="10" width="26" height="26" rx="4" fill="#0284C7"/>
-              <rect x="69" y="15" width="16" height="16" rx="2" fill="#FFFFFF"/>
-              <rect x="72" y="18" width="10" height="10" rx="1" fill="#0284C7"/>
-              <!-- Bottom Left Finder -->
-              <rect x="10" y="64" width="26" height="26" rx="4" fill="#0284C7"/>
-              <rect x="15" y="69" width="16" height="16" rx="2" fill="#FFFFFF"/>
-              <rect x="18" y="72" width="10" height="10" rx="1" fill="#0284C7"/>
-              <!-- Matrix Patterns -->
-              <rect x="42" y="12" width="6" height="6" fill="#0F172A"/>
-              <rect x="52" y="12" width="6" height="6" fill="#0F172A"/>
-              <rect x="42" y="24" width="6" height="6" fill="#0F172A"/>
-              <rect x="52" y="28" width="6" height="6" fill="#0F172A"/>
-              <rect x="12" y="44" width="6" height="6" fill="#0F172A"/>
-              <rect x="24" y="44" width="6" height="6" fill="#0F172A"/>
-              <rect x="42" y="44" width="8" height="8" fill="#0284C7"/>
-              <rect x="56" y="44" width="6" height="6" fill="#0F172A"/>
-              <rect x="70" y="44" width="8" height="6" fill="#0F172A"/>
-              <rect x="84" y="44" width="6" height="6" fill="#0F172A"/>
-              <rect x="44" y="64" width="6" height="6" fill="#0F172A"/>
-              <rect x="54" y="70" width="8" height="6" fill="#0F172A"/>
-              <rect x="70" y="64" width="6" height="6" fill="#0F172A"/>
-              <rect x="82" y="72" width="8" height="6" fill="#0F172A"/>
-              <rect x="64" y="82" width="6" height="8" fill="#0F172A"/>
-              <rect x="76" y="84" width="8" height="6" fill="#0F172A"/>
+        <!-- Top Purple Check Circle -->
+        <div class="ticket-status-halo">
+          <div class="ticket-status-circle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
           </div>
+        </div>
 
-          <div class="security-meta-text">
-            <div class="security-stamp-badge">
-              <i data-lucide="shield-check" style="width: 13px; height: 13px; color: #0284C7;"></i>
-              <span>AUTHENTIC ELECTRONIC ADVICE • SHA-256 ENCRYPTED</span>
+        <!-- Big Amount Display -->
+        <div class="ticket-amount-heading" id="receiptDispAmount">Rs. 260</div>
+
+        <!-- Timestamp line -->
+        <div class="ticket-timestamp-text" id="receiptDispTime">Sent at 6:53 PM on 17 Oct 26</div>
+
+        <!-- Perforated Ticket Divider with Notches & Spaced Dots -->
+        <div class="ticket-perforation-divider">
+          <div class="ticket-notch notch-left"></div>
+          <div class="ticket-dots-row">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="ticket-notch notch-right"></div>
+        </div>
+
+        <!-- From and To 2-Column Boxes -->
+        <div class="ticket-parties-row">
+          
+          <!-- From Box -->
+          <div class="ticket-party-card">
+            <span class="ticket-party-role">From</span>
+            <div class="ticket-party-body">
+              <div class="party-icon-purple">
+                <!-- Raqmi Islamic Rosette SVG -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="1.6">
+                  <rect x="5" y="5" width="14" height="14" rx="2" transform="rotate(45 12 12)"/>
+                  <rect x="5" y="5" width="14" height="14" rx="2"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </div>
+              <div class="party-text-info">
+                <div class="party-full-name">Hassan Khan</div>
+                <div class="party-acct-mask">*2009</div>
+              </div>
             </div>
-            <p class="security-disclaimer">
-              This is a system-generated electronic transaction advice. It requires no physical signature and confirms irrevocable debit from Hassan Khan's TPay wallet account.
-            </p>
+          </div>
+
+          <!-- To Box -->
+          <div class="ticket-party-card">
+            <span class="ticket-party-role">To</span>
+            <div class="ticket-party-body">
+              <div class="party-icon-dest" id="receiptDestIcon">
+                <!-- Target icon SVG -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <circle cx="12" cy="12" r="5" fill="#059669"/>
+                </svg>
+              </div>
+              <div class="party-text-info">
+                <div class="party-full-name" id="receiptDispRecipient">TEMOOR SHAH</div>
+                <div class="party-acct-mask" id="receiptDispAccount">*0254</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Transaction Details Rows -->
+        <div class="ticket-details-block">
+          <div class="ticket-detail-row">
+            <span class="detail-label">Transaction ID</span>
+            <span class="detail-value" id="receiptDispRef">488274323</span>
+          </div>
+          <div class="ticket-detail-row">
+            <span class="detail-label">Transaction Channel</span>
+            <span class="detail-value" id="receiptDispChannel">Raast</span>
           </div>
         </div>
 
-        <!-- Actions -->
-        <div class="receipt-buttons-row">
-          <button class="btn-print-voucher" id="btnPrintReceipt">
-            <i data-lucide="printer" style="width: 15px; height: 15px;"></i>
-            <span>Print / Save PDF</span>
-          </button>
-          <button class="btn-share-voucher" id="btnShareReceipt">
-            <i data-lucide="share-2" style="width: 15px; height: 15px;"></i>
-            <span>Share</span>
-          </button>
-          <button class="btn-close-voucher" id="btnCloseReceiptModal">
-            <span>Done</span>
-          </button>
+        <!-- Bottom Footer (Processed Securely By | Logo) -->
+        <div class="ticket-footer-brand">
+          <div class="processed-tag">Processed<br>Securely By</div>
+          <div class="footer-v-divider"></div>
+          <div class="footer-raqami-logo">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="1.8">
+              <rect x="5" y="5" width="14" height="14" rx="2" transform="rotate(45 12 12)"/>
+              <rect x="5" y="5" width="14" height="14" rx="2"/>
+              <circle cx="12" cy="12" r="2.5"/>
+            </svg>
+            <div class="raqami-brand-text">
+              <div class="raqami-eng">RAQAMI • TPAY</div>
+              <div class="raqami-sub">ISLAMIC DIGITAL BANK</div>
+            </div>
+          </div>
         </div>
 
+      </div>
+
+      <!-- Buttons below the ticket -->
+      <div class="ticket-actions-bar">
+        <button class="btn-ticket-done" id="btnCloseReceiptModal">Done</button>
+        <button class="btn-ticket-share" id="btnPrintReceipt">
+          <i data-lucide="printer" style="width: 16px; height: 16px;"></i>
+          <span>Save PDF / Print</span>
+        </button>
       </div>
 
     </div>
