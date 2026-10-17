@@ -49,9 +49,8 @@ class TPayPortal {
     this.transactions = this.loadTransactions();
     this.enteredPin = "";
     this.isBalanceHidden = true;
-    this.splashDuration = 4500; // 4.5 seconds smooth splash
+    this.splashDuration = 1300; // Fast smooth splash (1.3 seconds)
     this.splashTimer = null;
-    this.selectedCarrier = "Jazz";
 
     this.initElements();
     this.bindEvents();
@@ -104,6 +103,7 @@ class TPayPortal {
     this.splashScreen = document.getElementById("splashScreen");
     this.lockScreen = document.getElementById("lockScreen");
     this.dashboardScreen = document.getElementById("dashboardScreen");
+    this.sendScreen = document.getElementById("sendScreen");
 
     // Splash Elements
     this.splashFillBar = document.getElementById("splashFillBar");
@@ -130,7 +130,6 @@ class TPayPortal {
 
     // Action Triggers
     this.btnTriggerSend = document.getElementById("btnTriggerSend");
-    this.btnTriggerTopup = document.getElementById("btnTriggerTopup");
     this.btnTriggerRequest = document.getElementById("btnTriggerRequest");
     this.btnTriggerBills = document.getElementById("btnTriggerBills");
 
@@ -139,23 +138,17 @@ class TPayPortal {
     this.bottomNavCards = document.getElementById("bottomNavCards");
     this.bottomNavProfile = document.getElementById("bottomNavProfile");
 
-    // Modals
-    this.modalSendMoney = document.getElementById("modalSendMoney");
-    this.modalTopup = document.getElementById("modalTopup");
+    // Send Form & Navigation
     this.btnBackFromSend = document.getElementById("btnBackFromSend");
-
-    // Send Form
     this.sendDestinationBank = document.getElementById("sendDestinationBank");
+    this.sendRecipientName = document.getElementById("sendRecipientName");
     this.sendRecipientAccount = document.getElementById("sendRecipientAccount");
     this.sendAmountField = document.getElementById("sendAmountField");
     this.sendPurposeSelect = document.getElementById("sendPurposeSelect");
     this.btnExecuteSend = document.getElementById("btnExecuteSend");
 
-    // Topup Form
-    this.topupPhoneNumber = document.getElementById("topupPhoneNumber");
-    this.topupAmountInput = document.getElementById("topupAmountInput");
-    this.btnExecuteTopup = document.getElementById("btnExecuteTopup");
-    this.carrierCards = document.querySelectorAll(".carrier-card-item");
+    // Modals
+    this.modalOfficialReceipt = document.getElementById("modalOfficialReceipt");
 
     // Ticket Receipt Elements (Raqmi style)
     this.receiptDispAmount = document.getElementById("receiptDispAmount");
@@ -219,9 +212,10 @@ class TPayPortal {
       this.notify("Activity feed restored");
     });
 
-    // Modal Triggers
-    this.btnTriggerSend.addEventListener("click", () => this.showScreen("sendScreen"));
-    this.btnTriggerTopup.addEventListener("click", () => this.openModal(this.modalTopup));
+    // Action Triggers
+    if (this.btnTriggerSend) {
+      this.btnTriggerSend.addEventListener("click", () => this.showScreen("sendScreen"));
+    }
 
     if (this.bottomNavSend) {
       this.bottomNavSend.addEventListener("click", () => this.showScreen("sendScreen"));
@@ -239,13 +233,17 @@ class TPayPortal {
       });
     }
 
-    this.btnTriggerRequest.addEventListener("click", () => {
-      this.notify("Payment link generated: tpay.me/hassan_khan");
-    });
+    if (this.btnTriggerRequest) {
+      this.btnTriggerRequest.addEventListener("click", () => {
+        this.notify("Payment link generated: tpay.me/hassan_khan");
+      });
+    }
 
-    this.btnTriggerBills.addEventListener("click", () => {
-      this.notify("Bills Portal: LESCO, SNGPL, PTCL connected");
-    });
+    if (this.btnTriggerBills) {
+      this.btnTriggerBills.addEventListener("click", () => {
+        this.notify("Bills Portal: LESCO, SNGPL, PTCL connected");
+      });
+    }
 
     // Modal Close
     document.querySelectorAll("[data-dismiss]").forEach(btn => {
@@ -261,7 +259,7 @@ class TPayPortal {
         document.querySelectorAll("#quickBankBadges .quick-chip").forEach(b => b.classList.remove("active"));
         badge.classList.add("active");
         const bankVal = badge.getAttribute("data-quickbank");
-        if (bankVal) {
+        if (bankVal && this.sendDestinationBank) {
           this.sendDestinationBank.value = bankVal;
         }
       });
@@ -273,8 +271,13 @@ class TPayPortal {
         const name = chip.getAttribute("data-name");
         const iban = chip.getAttribute("data-iban");
         const bank = chip.getAttribute("data-bank");
-        this.sendRecipientAccount.value = `${name} (${iban})`;
-        if (bank) {
+        if (this.sendRecipientName) {
+          this.sendRecipientName.value = name || "";
+        }
+        if (this.sendRecipientAccount) {
+          this.sendRecipientAccount.value = iban || "";
+        }
+        if (bank && this.sendDestinationBank) {
           this.sendDestinationBank.value = bank;
         }
       });
@@ -283,41 +286,35 @@ class TPayPortal {
     // Quick Send Amounts
     document.querySelectorAll("#sendScreen [data-amt]").forEach(chip => {
       chip.addEventListener("click", () => {
-        this.sendAmountField.value = chip.getAttribute("data-amt");
-      });
-    });
-
-    // Quick Topup Amounts
-    document.querySelectorAll("#modalTopup [data-topupamt]").forEach(chip => {
-      chip.addEventListener("click", () => {
-        this.topupAmountInput.value = chip.getAttribute("data-topupamt");
-      });
-    });
-
-    // Carrier selector
-    this.carrierCards.forEach(card => {
-      card.addEventListener("click", () => {
-        this.carrierCards.forEach(c => c.classList.remove("selected"));
-        card.classList.add("selected");
-        this.selectedCarrier = card.getAttribute("data-carrier");
+        if (this.sendAmountField) {
+          this.sendAmountField.value = chip.getAttribute("data-amt");
+        }
       });
     });
 
     // Execute Send
-    this.btnExecuteSend.addEventListener("click", () => this.processSendMoney());
+    if (this.btnExecuteSend) {
+      this.btnExecuteSend.addEventListener("click", () => this.processSendMoney());
+    }
 
-    // Execute Topup
-    this.btnExecuteTopup.addEventListener("click", () => this.processTopup());
+    // Back from Send Screen
+    if (this.btnBackFromSend) {
+      this.btnBackFromSend.addEventListener("click", () => this.showScreen("dashboardScreen"));
+    }
 
-    // Print Receipt
-    this.btnPrintReceipt.addEventListener("click", () => {
-      window.print();
-    });
+    // Print / Save Receipt
+    if (this.btnPrintReceipt) {
+      this.btnPrintReceipt.addEventListener("click", () => {
+        window.print();
+      });
+    }
 
-    this.btnCloseReceiptModal.addEventListener("click", () => {
-      this.closeModal(this.modalOfficialReceipt);
-    });
-    this.btnBackFromSend.addEventListener("click", () => this.showScreen("dashboardScreen"));
+    // Close Receipt Modal
+    if (this.btnCloseReceiptModal) {
+      this.btnCloseReceiptModal.addEventListener("click", () => {
+        this.closeModal(this.modalOfficialReceipt);
+      });
+    }
   }
 
   // --- Splash Engine ---
@@ -473,17 +470,25 @@ class TPayPortal {
 
   // --- Send Money Flow ---
   processSendMoney() {
-    const bank = this.sendDestinationBank.value;
-    const recipient = this.sendRecipientAccount.value.trim();
-    const amount = parseFloat(this.sendAmountField.value);
-    const purpose = this.sendPurposeSelect.value;
+    const bank = this.sendDestinationBank ? this.sendDestinationBank.value : "Easypaisa";
+    const recipientName = (this.sendRecipientName ? this.sendRecipientName.value.trim() : "");
+    const recipientAccount = (this.sendRecipientAccount ? this.sendRecipientAccount.value.trim() : "");
+    const amount = parseFloat(this.sendAmountField ? this.sendAmountField.value : "0");
+    const purpose = this.sendPurposeSelect ? this.sendPurposeSelect.value : "Transfer";
 
-    if (!recipient) {
-      alert("Please specify a recipient name, account number, or IBAN.");
+    if (!recipientName) {
+      alert("Please enter the Beneficiary / Receiver Name.");
+      if (this.sendRecipientName) this.sendRecipientName.focus();
+      return;
+    }
+    if (!recipientAccount) {
+      alert("Please enter recipient account number or mobile wallet.");
+      if (this.sendRecipientAccount) this.sendRecipientAccount.focus();
       return;
     }
     if (!amount || amount <= 0) {
-      alert("Please enter a valid amount.");
+      alert("Please enter a valid transfer amount.");
+      if (this.sendAmountField) this.sendAmountField.focus();
       return;
     }
     if (amount > this.balance) {
@@ -491,29 +496,26 @@ class TPayPortal {
       return;
     }
 
-    this.btnExecuteSend.disabled = true;
-    this.btnExecuteSend.innerHTML = `<span>Processing via Raast...</span>`;
+    if (this.btnExecuteSend) {
+      this.btnExecuteSend.disabled = true;
+      this.btnExecuteSend.innerHTML = `<span>Processing via Raast...</span>`;
+    }
 
     setTimeout(() => {
-      this.btnExecuteSend.disabled = false;
-      this.btnExecuteSend.innerHTML = `<span>Proceed & Send</span> <i data-lucide="arrow-right"></i>`;
+      if (this.btnExecuteSend) {
+        this.btnExecuteSend.disabled = false;
+        this.btnExecuteSend.innerHTML = `<span>Proceed & Send</span> <i data-lucide="arrow-right"></i>`;
+      }
 
       // Deduct balance
       const newBal = this.balance - amount;
       this.saveBalance(newBal);
 
-      // Clean name and last 4 digits
-      let cleanRecipient = recipient;
-      let last4 = "*" + Math.floor(1000 + Math.random() * 9000);
-      if (recipient.includes("(") && recipient.includes(")")) {
-        cleanRecipient = recipient.split("(")[0].trim();
-        const acct = recipient.split("(")[1].replace(")", "").trim();
-        last4 = "*" + acct.slice(-4);
-      } else if (recipient.length >= 4) {
-        last4 = "*" + recipient.slice(-4);
-      }
+      // Extract last 4 characters for mask
+      const cleanAcct = recipientAccount.replace(/[^0-9a-zA-Z]/g, "");
+      const last4 = "*" + (cleanAcct.length >= 4 ? cleanAcct.slice(-4) : cleanAcct);
 
-      // 9-digit Raast Transaction ID (like 488274323 in user reference image)
+      // 9-digit Raast Transaction ID
       const refId = Math.floor(400000000 + Math.random() * 590000000).toString();
 
       // Format date like: "Sent at 6:53 PM on 17 Oct 26"
@@ -530,10 +532,10 @@ class TPayPortal {
       const year = now.getFullYear().toString().slice(-2);
       const formattedTimestamp = `Sent at ${hours}:${minutes} ${ampm} on ${day} ${month} ${year}`;
 
-      // Add to feed
+      // Add to transaction feed
       const newTx = {
         id: refId,
-        title: `Transfer to ${cleanRecipient.toUpperCase()}`,
+        title: `Transfer to ${recipientName.toUpperCase()}`,
         type: "send",
         amount: `-${this.formatCurrency(amount)}`,
         date: "Just now",
@@ -542,112 +544,58 @@ class TPayPortal {
       this.transactions.unshift(newTx);
       this.saveTransactions();
 
-      // Reset form
-      this.sendRecipientAccount.value = "";
-      this.sendAmountField.value = "";
-      this.closeModal(this.modalSendMoney);
+      // Clear input fields
+      if (this.sendRecipientName) this.sendRecipientName.value = "";
+      if (this.sendRecipientAccount) this.sendRecipientAccount.value = "";
+      if (this.sendAmountField) this.sendAmountField.value = "";
 
-      // Show Exact Replica Ticket Receipt
+      // Return to dashboard
+      this.showScreen("dashboardScreen");
+
+      // Show realistic Raast/Raqmi slip/receipt modal
       this.showReceiptModal({
         amountStr: `Rs. ${this.formatCurrency(amount).replace('.00', '')}`,
         timestamp: formattedTimestamp,
-        recipient: cleanRecipient.toUpperCase(),
+        recipient: recipientName.toUpperCase(),
         accountMask: last4,
         bank: bank,
         ref: refId,
         channel: "Raast"
       });
-    }, 900);
-  }
-
-  // --- Mobile Top-up Flow ---
-  processTopup() {
-    const phone = this.topupPhoneNumber.value.trim();
-    const amount = parseFloat(this.topupAmountInput.value);
-
-    if (!phone) {
-      alert("Please enter a valid mobile number.");
-      return;
-    }
-    if (!amount || amount <= 0) {
-      alert("Please enter recharge amount.");
-      return;
-    }
-    if (amount > this.balance) {
-      alert("Insufficient available balance.");
-      return;
-    }
-
-    this.btnExecuteTopup.disabled = true;
-    this.btnExecuteTopup.innerHTML = `<span>Recharging ${this.selectedCarrier}...</span>`;
-
-    setTimeout(() => {
-      this.btnExecuteTopup.disabled = false;
-      this.btnExecuteTopup.innerHTML = `<span>Instant Recharge</span> <i data-lucide="zap"></i>`;
-
-      const newBal = this.balance - amount;
-      this.saveBalance(newBal);
-
-      const refId = Math.floor(400000000 + Math.random() * 590000000).toString();
-      const now = new Date();
-      let hours = now.getHours();
-      let minutes = now.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12;
-      minutes = minutes < 10 ? '0' + minutes : minutes;
-      const day = now.getDate();
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const month = monthNames[now.getMonth()];
-      const year = now.getFullYear().toString().slice(-2);
-      const formattedTimestamp = `Sent at ${hours}:${minutes} ${ampm} on ${day} ${month} ${year}`;
-
-      const newTx = {
-        id: refId,
-        title: `${this.selectedCarrier} Mobile Top-Up`,
-        type: "topup",
-        amount: `-${this.formatCurrency(amount)}`,
-        date: "Just now",
-        meta: `${phone} • Fast Recharge`
-      };
-      this.transactions.unshift(newTx);
-      this.saveTransactions();
-
-      this.topupPhoneNumber.value = "";
-      this.topupAmountInput.value = "";
-      this.closeModal(this.modalTopup);
-
-      this.showReceiptModal({
-        amountStr: `Rs. ${this.formatCurrency(amount).replace('.00', '')}`,
-        timestamp: formattedTimestamp,
-        recipient: `${this.selectedCarrier} (${phone})`,
-        accountMask: "*" + phone.slice(-4),
-        bank: `${this.selectedCarrier} Telecom`,
-        ref: refId,
-        channel: "Direct Airtime"
-      });
-    }, 900);
+    }, 800);
   }
 
   // --- Show Exact Ticket Receipt ---
   showReceiptModal(data) {
-    this.receiptDispAmount.textContent = data.amountStr;
-    this.receiptDispTime.textContent = data.timestamp;
-    this.receiptDispRecipient.textContent = data.recipient;
-    this.receiptDispAccount.textContent = data.accountMask;
-    this.receiptDispRef.textContent = data.ref;
-    this.receiptDispChannel.textContent = data.channel;
+    if (this.receiptDispAmount) this.receiptDispAmount.textContent = data.amountStr;
+    if (this.receiptDispTime) this.receiptDispTime.textContent = data.timestamp;
+    if (this.receiptDispRecipient) this.receiptDispRecipient.textContent = data.recipient;
+    if (this.receiptDispAccount) this.receiptDispAccount.textContent = data.accountMask;
+    if (this.receiptDispRef) this.receiptDispRef.textContent = data.ref;
+    if (this.receiptDispChannel) this.receiptDispChannel.textContent = data.channel;
 
-    this.openModal(this.modalOfficialReceipt);
+    if (!this.modalOfficialReceipt) {
+      this.modalOfficialReceipt = document.getElementById("modalOfficialReceipt");
+    }
+    if (this.modalOfficialReceipt) {
+      this.openModal(this.modalOfficialReceipt);
+    }
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   // --- Modals Helper ---
   openModal(modal) {
-    modal.classList.add("is-open");
+    if (modal) {
+      modal.classList.add("is-open");
+    }
   }
 
   closeModal(modal) {
-    modal.classList.remove("is-open");
+    if (modal) {
+      modal.classList.remove("is-open");
+    }
   }
 
   // --- Toast Notifications ---

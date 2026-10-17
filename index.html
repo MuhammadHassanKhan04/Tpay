@@ -267,14 +267,23 @@
       </select>
     </div>
     <!-- Quick Beneficiaries -->
-    <div class="form-item-wrap" id="contactsRow">
-      <label class="form-label-title">Recent Beneficiaries</label>
-      <div class="chips-row-wrap" id="contactsRow"></div>
+    <div class="form-item-wrap">
+      <label class="form-label-title">Quick Beneficiaries</label>
+      <div class="chips-row-wrap" id="contactsRow">
+        <span class="quick-chip" data-name="TEMOOR SHAH" data-iban="0300-8822054" data-bank="Easypaisa">TEMOOR SHAH</span>
+        <span class="quick-chip" data-name="Ahmed Raza" data-iban="0312-9988441" data-bank="JazzCash">Ahmed Raza</span>
+        <span class="quick-chip" data-name="Fatima Noor" data-iban="PK92 MEZN 0021 4455" data-bank="Meezan Bank">Fatima Noor</span>
+      </div>
+    </div>
+    <!-- Beneficiary / Receiver Full Name -->
+    <div class="form-item-wrap">
+      <label class="form-label-title" for="sendRecipientName">Beneficiary / Receiver Full Name</label>
+      <input type="text" id="sendRecipientName" class="custom-input" placeholder="e.g. TEMOOR SHAH or Tariq Mehmood" required>
     </div>
     <!-- Recipient Account -->
     <div class="form-item-wrap">
-      <label class="form-label-title" for="sendRecipientAccount">Recipient Account / Mobile Number / IBAN</label>
-      <input type="text" id="sendRecipientAccount" class="custom-input" placeholder="e.g. 0300 1234567 or IBAN">
+      <label class="form-label-title" for="sendRecipientAccount">Account / Mobile Number / IBAN</label>
+      <input type="text" id="sendRecipientAccount" class="custom-input" placeholder="e.g. 0300 1234567 or IBAN" required>
     </div>
     <!-- Amount -->
     <div class="form-item-wrap">
@@ -301,61 +310,6 @@
     <button class="btn-submit-sky" id="btnExecuteSend"><span>Proceed &amp; Send</span><i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i></button>
   </div>
 </section>
-<!-- 2. Mobile Top-Up Modal -->
-  <div class="modal-backdrop-layer" id="modalTopup">
-
-      <div class="modal-mobile-handle"></div>
-
-        <h3 class="modal-title-text">Mobile Top-Up</h3>
-        <button class="btn-modal-close-x" data-dismiss="modalTopup">
-          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
-        </button>
-      </div>
-
-      <div class="form-item-wrap">
-        <label class="form-label-title">Select Cellular Operator</label>
-        <div class="carrier-options-grid" id="operatorSelectGrid">
-          <div class="carrier-card-item selected" data-carrier="Jazz">
-            <div class="carrier-card-logo">⚡</div>
-            <div class="carrier-card-name">Jazz</div>
-          </div>
-          <div class="carrier-card-item" data-carrier="Telenor">
-            <div class="carrier-card-logo">🌐</div>
-            <div class="carrier-card-name">Telenor</div>
-          </div>
-          <div class="carrier-card-item" data-carrier="Zong">
-            <div class="carrier-card-logo">📶</div>
-            <div class="carrier-card-name">Zong</div>
-          </div>
-          <div class="carrier-card-item" data-carrier="Ufone">
-            <div class="carrier-card-logo">🟢</div>
-            <div class="carrier-card-name">Ufone</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-item-wrap">
-        <label class="form-label-title" for="topupPhoneNumber">Mobile Number</label>
-        <input type="tel" id="topupPhoneNumber" class="custom-input" placeholder="0300 1234567" maxlength="11">
-      </div>
-
-      <div class="form-item-wrap">
-        <label class="form-label-title" for="topupAmountInput">Recharge Amount (PKR)</label>
-        <input type="number" id="topupAmountInput" class="custom-input" placeholder="0" min="50">
-        <div class="chips-row-wrap">
-          <span class="quick-chip" data-topupamt="250">₨ 250</span>
-          <span class="quick-chip" data-topupamt="500">₨ 500</span>
-          <span class="quick-chip" data-topupamt="1000">₨ 1,000</span>
-          <span class="quick-chip" data-topupamt="2000">₨ 2,000</span>
-        </div>
-      </div>
-
-      <button class="btn-submit-sky" id="btnExecuteTopup">
-        <span>Instant Recharge</span>
-        <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
-      </button>
-    </div>
-  </div>
 
   <!-- ============================================================== -->
   <!-- 3. EXACT REALISTIC RAQAMI / RAAST TICKET RECEIPT MODAL         -->
