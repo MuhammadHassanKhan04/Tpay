@@ -142,7 +142,7 @@ class TPayPortal {
     // Modals
     this.modalSendMoney = document.getElementById("modalSendMoney");
     this.modalTopup = document.getElementById("modalTopup");
-    this.modalOfficialReceipt = document.getElementById("modalOfficialReceipt");
+    this.btnBackFromSend = document.getElementById("btnBackFromSend");
 
     // Send Form
     this.sendDestinationBank = document.getElementById("sendDestinationBank");
@@ -220,11 +220,11 @@ class TPayPortal {
     });
 
     // Modal Triggers
-    this.btnTriggerSend.addEventListener("click", () => this.openModal(this.modalSendMoney));
+    this.btnTriggerSend.addEventListener("click", () => this.showScreen("sendScreen"));
     this.btnTriggerTopup.addEventListener("click", () => this.openModal(this.modalTopup));
 
     if (this.bottomNavSend) {
-      this.bottomNavSend.addEventListener("click", () => this.openModal(this.modalSendMoney));
+      this.bottomNavSend.addEventListener("click", () => this.showScreen("sendScreen"));
     }
     if (this.bottomNavCards) {
       this.bottomNavCards.addEventListener("click", () => {
@@ -317,6 +317,7 @@ class TPayPortal {
     this.btnCloseReceiptModal.addEventListener("click", () => {
       this.closeModal(this.modalOfficialReceipt);
     });
+    this.btnBackFromSend.addEventListener("click", () => this.showScreen("dashboardScreen"));
   }
 
   // --- Splash Engine ---
