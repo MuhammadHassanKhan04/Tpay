@@ -13,6 +13,20 @@
 </head>
 <body>
 
+  <!-- Top Real-time Mobile Push Notification Banner -->
+  <div class="mobile-push-notification" id="mobilePushNotification">
+    <div class="push-icon-circle">
+      <img src="tpay_logo.png" alt="TPay" class="push-logo-img">
+    </div>
+    <div class="push-text-col">
+      <div class="push-title-row">
+        <span class="push-app-name">TPay • Instant Transfer</span>
+        <span class="push-time-tag">Just now</span>
+      </div>
+      <div class="push-body-msg" id="pushBodyMsg">Payment sent successfully!</div>
+    </div>
+  </div>
+
   <!-- ============================================================== -->
   <!-- 1. STAGE ONE: 100% FULLSCREEN SPLASH SCREEN                    -->
   <!-- ============================================================== -->
@@ -224,47 +238,81 @@
   <div class="stage-content">
     <!-- Quick Bank Filter Badges -->
     <div class="form-item-wrap">
-      <label class="form-label-title">Quick Destination</label>
+      <div class="form-label-row">
+        <label class="form-label-title">Popular Wallets & Banks</label>
+        <span class="form-label-hint">Tap to select</span>
+      </div>
       <div class="chips-row-wrap" id="quickBankBadges">
-        <span class="quick-chip active" data-quickbank="Easypaisa">Easypaisa</span>
-        <span class="quick-chip" data-quickbank="JazzCash">JazzCash</span>
-        <span class="quick-chip" data-quickbank="Raqmi Islamic Digital Bank">Raqmi Bank</span>
-        <span class="quick-chip" data-quickbank="SadaPay">SadaPay</span>
-        <span class="quick-chip" data-quickbank="Meezan Bank">Meezan Bank</span>
-        <span class="quick-chip" data-quickbank="Habib Bank Limited (HBL)">HBL</span>
+        <span class="quick-chip active" data-quickbank="Easypaisa">
+          <span class="bank-dot ep-dot"></span>Easypaisa
+        </span>
+        <span class="quick-chip" data-quickbank="JazzCash">
+          <span class="bank-dot jc-dot"></span>JazzCash
+        </span>
+        <span class="quick-chip" data-quickbank="Raqmi Islamic Digital Bank">
+          <span class="bank-dot rq-dot"></span>Raqmi Bank
+        </span>
+        <span class="quick-chip" data-quickbank="SadaPay">
+          <span class="bank-dot sp-dot"></span>SadaPay
+        </span>
+        <span class="quick-chip" data-quickbank="NayaPay">
+          <span class="bank-dot np-dot"></span>NayaPay
+        </span>
+        <span class="quick-chip" data-quickbank="Meezan Bank">
+          <span class="bank-dot mz-dot"></span>Meezan Bank
+        </span>
+        <span class="quick-chip" data-quickbank="Habib Bank Limited (HBL)">
+          <span class="bank-dot hbl-dot"></span>HBL
+        </span>
+        <span class="quick-chip" data-quickbank="Bank Alfalah">
+          <span class="bank-dot ba-dot"></span>Bank Alfalah
+        </span>
       </div>
     </div>
     <!-- Comprehensive Destination Bank / Wallet Selector -->
     <div class="form-item-wrap">
-      <label class="form-label-title" for="sendDestinationBank">Select Bank or Mobile Wallet</label>
-      <select id="sendDestinationBank" class="custom-input">
-        <optgroup label="Mobile Wallets & Microfinance Banks">
-          <option value="Easypaisa" selected>Easypaisa (Telenor Microfinance Bank)</option>
-          <option value="JazzCash">JazzCash (Mobilink Microfinance Bank)</option>
-          <option value="Raqmi Islamic Digital Bank">Raqmi Islamic Digital Bank</option>
-          <option value="SadaPay">SadaPay</option>
-          <option value="NayaPay">NayaPay</option>
-          <option value="TPay Internal Wallet">TPay Wallet (Instant)</option>
-          <option value="U Microfinance Bank (UPaisa)">UPaisa (U Microfinance Bank)</option>
-        </optgroup>
-        <optgroup label="Major Commercial & Islamic Banks">
-          <option value="Meezan Bank">Meezan Bank Limited</option>
-          <option value="Habib Bank Limited (HBL)">Habib Bank Limited (HBL)</option>
-          <option value="Bank Alfalah">Bank Alfalah</option>
-          <option value="United Bank Limited (UBL)">United Bank Limited (UBL)</option>
-          <option value="MCB Bank Limited">MCB Bank Limited</option>
-          <option value="Allied Bank Limited (ABL)">Allied Bank Limited (ABL)</option>
-          <option value="Faysal Bank">Faysal Bank Limited</option>
-          <option value="Standard Chartered Bank">Standard Chartered Bank Pakistan</option>
-          <option value="Bank of Punjab (BOP)">Bank of Punjab (BOP)</option>
-          <option value="Askari Bank">Askari Bank Limited</option>
-          <option value="BankIslami">BankIslami Pakistan Limited</option>
-          <option value="JS Bank">JS Bank</option>
-          <option value="Soneri Bank">Soneri Bank</option>
-          <option value="Dubai Islamic Bank">Dubai Islamic Bank (DIB)</option>
-          <option value="Al Baraka Bank">Al Baraka Bank</option>
-        </optgroup>
-      </select>
+      <label class="form-label-title" for="sendDestinationBank">Select Bank / Microfinance / Wallet (All Pakistan)</label>
+      <div class="styled-select-wrap">
+        <i data-lucide="landmark" class="select-lead-icon"></i>
+        <select id="sendDestinationBank" class="custom-input custom-bank-select">
+          <optgroup label="⚡ Mobile Wallets & Digital Microfinance Banks">
+            <option value="Easypaisa" selected>Easypaisa (Telenor Microfinance Bank)</option>
+            <option value="JazzCash">JazzCash (Mobilink Microfinance Bank)</option>
+            <option value="Raqmi Islamic Digital Bank">Raqmi Islamic Digital Bank</option>
+            <option value="SadaPay">SadaPay (Mastercard Wallet)</option>
+            <option value="NayaPay">NayaPay (Visa Digital Wallet)</option>
+            <option value="TPay Internal Wallet">TPay Wallet (Instant 0-Fee)</option>
+            <option value="U Microfinance Bank (UPaisa)">UPaisa (U Microfinance Bank)</option>
+            <option value="Khushhali Microfinance Bank">Khushhali Microfinance Bank</option>
+            <option value="FINCA Microfinance Bank">FINCA Microfinance Bank</option>
+            <option value="Mobilink Microfinance Bank">Mobilink Microfinance Bank</option>
+          </optgroup>
+          <optgroup label="🏦 Major Commercial & Islamic Banks">
+            <option value="Meezan Bank">Meezan Bank Limited</option>
+            <option value="Habib Bank Limited (HBL)">Habib Bank Limited (HBL)</option>
+            <option value="Bank Alfalah">Bank Alfalah Limited</option>
+            <option value="United Bank Limited (UBL)">United Bank Limited (UBL)</option>
+            <option value="MCB Bank Limited">MCB Bank Limited</option>
+            <option value="Allied Bank Limited (ABL)">Allied Bank Limited (ABL)</option>
+            <option value="Faysal Bank">Faysal Bank Limited</option>
+            <option value="Standard Chartered Bank">Standard Chartered Bank Pakistan</option>
+            <option value="Bank of Punjab (BOP)">Bank of Punjab (BOP)</option>
+            <option value="Askari Bank">Askari Bank Limited</option>
+            <option value="BankIslami">BankIslami Pakistan Limited</option>
+            <option value="JS Bank">JS Bank Limited</option>
+            <option value="Soneri Bank">Soneri Bank Limited</option>
+            <option value="Dubai Islamic Bank">Dubai Islamic Bank (DIB)</option>
+            <option value="Al Baraka Bank">Al Baraka Bank Pakistan</option>
+            <option value="Bank of Khyber">Bank of Khyber</option>
+            <option value="Sindh Bank">Sindh Bank Limited</option>
+            <option value="Silkbank">Silkbank Limited</option>
+            <option value="Summit Bank">Summit Bank Limited</option>
+            <option value="Habib Metropolitan Bank">Habib Metropolitan Bank</option>
+            <option value="National Bank of Pakistan (NBP)">National Bank of Pakistan (NBP)</option>
+          </optgroup>
+        </select>
+        <i data-lucide="chevron-down" class="select-trail-icon"></i>
+      </div>
     </div>
     <!-- Quick Beneficiaries -->
     <div class="form-item-wrap">

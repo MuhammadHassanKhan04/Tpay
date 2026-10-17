@@ -159,6 +159,10 @@ class TPayPortal {
     this.receiptDispChannel = document.getElementById("receiptDispChannel");
     this.btnPrintReceipt = document.getElementById("btnPrintReceipt");
     this.btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
+    // Top Push Notification
+    this.mobilePushNotification = document.getElementById("mobilePushNotification");
+    this.pushBodyMsg = document.getElementById("pushBodyMsg");
+    this.pushTimeout = null;
   }
 
   // --- Event Handling ---
@@ -265,6 +269,20 @@ class TPayPortal {
       });
     });
 
+    // Dropdown change syncs active badge
+    if (this.sendDestinationBank) {
+      this.sendDestinationBank.addEventListener("change", () => {
+        const selectedBank = this.sendDestinationBank.value;
+        document.querySelectorAll("#quickBankBadges .quick-chip").forEach(badge => {
+          if (badge.getAttribute("data-quickbank") === selectedBank) {
+            badge.classList.add("active");
+          } else {
+            badge.classList.remove("active");
+          }
+        });
+      });
+    }
+
     // Quick Beneficiaries
     document.querySelectorAll("#contactsRow .quick-chip").forEach(chip => {
       chip.addEventListener("click", () => {
@@ -279,6 +297,13 @@ class TPayPortal {
         }
         if (bank && this.sendDestinationBank) {
           this.sendDestinationBank.value = bank;
+          document.querySelectorAll("#quickBankBadges .quick-chip").forEach(b => {
+            if (b.getAttribute("data-quickbank") === bank) {
+              b.classList.add("active");
+            } else {
+              b.classList.remove("active");
+            }
+          });
         }
       });
     });
@@ -552,6 +577,12 @@ class TPayPortal {
       // Return to dashboard
       this.showScreen("dashboardScreen");
 
+      // Play authentic banking bell / ring chime & trigger mobile vibration
+      this.playSuccessChime();
+
+      // Show top push notification banner
+      this.showPushNotification(`₨ ${this.formatCurrency(amount).replace('.00', '')} successfully sent to ${recipientName.toUpperCase()} via Raast!`);
+
       // Show realistic Raast/Raqmi slip/receipt modal
       this.showReceiptModal({
         amountStr: `Rs. ${this.formatCurrency(amount).replace('.00', '')}`,
@@ -563,6 +594,78 @@ class TPayPortal {
         channel: "Raast"
       });
     }, 800);
+  }
+
+  // --- Banking Ring / Bell Chime Sound + Haptic Vibration ---
+  playSuccessChime() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+
+      const now = ctx.currentTime;
+
+      // Helper to synthesize physical bell harmonics
+      const playBellNote = (freq, startTime, duration, volume) => {
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        gainNode.gain.setValueAtTime(0, startTime);
+        gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.015);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+
+      // 3-note melodic crystal fintech payment chime (Ding-dong-ring)
+      playBellNote(659.25, now, 0.45, 0.32);           // Note 1: E5
+      playBellNote(830.61, now + 0.12, 0.55, 0.35);     // Note 2: G#5
+      playBellNote(1046.50, now + 0.24, 0.90, 0.40);    // Note 3: C6
+      playBellNote(1318.51, now + 0.26, 0.95, 0.25);    // Harmonic: E6
+
+      // Mobile phone vibration ring pattern (120ms buzz, 60ms pause, 180ms buzz)
+      if (navigator.vibrate) {
+        navigator.vibrate([120, 60, 180]);
+      }
+    } catch (err) {
+      console.warn("Audio chime error:", err);
+    }
+  }
+
+  // --- Real-time Mobile Push Notification Banner ---
+  showPushNotification(msg) {
+    if (!this.mobilePushNotification) {
+      this.mobilePushNotification = document.getElementById("mobilePushNotification");
+    }
+    if (!this.pushBodyMsg) {
+      this.pushBodyMsg = document.getElementById("pushBodyMsg");
+    }
+
+    if (this.pushBodyMsg) {
+      this.pushBodyMsg.textContent = msg;
+    }
+
+    if (this.mobilePushNotification) {
+      if (this.pushTimeout) clearTimeout(this.pushTimeout);
+      this.mobilePushNotification.classList.add("is-visible");
+
+      this.pushTimeout = setTimeout(() => {
+        if (this.mobilePushNotification) {
+          this.mobilePushNotification.classList.remove("is-visible");
+        }
+      }, 5000);
+    }
   }
 
   // --- Show Exact Ticket Receipt ---
