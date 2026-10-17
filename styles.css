@@ -1040,27 +1040,29 @@ body {
 
 .ticket-receipt-card {
   background: #FFFFFF;
-  border-radius: 28px;
-  padding: 26px 20px 22px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  border-radius: 26px;
+  padding: 22px 18px 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ticket-status-halo {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--ticket-purple-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 12px;
+  margin: 0 auto 10px;
 }
 
 .ticket-status-circle {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--ticket-purple);
   display: flex;
@@ -1070,20 +1072,20 @@ body {
 }
 
 .ticket-amount-heading {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 800;
   color: var(--ticket-purple-dark);
   text-align: center;
   letter-spacing: -0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .ticket-timestamp-text {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
   text-align: center;
   font-weight: 500;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 /* Perforated Divider with Cutouts and Dots */
@@ -1092,7 +1094,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 -20px 20px;
+  margin: 0 -18px 14px;
   height: 26px;
 }
 
@@ -1132,19 +1134,26 @@ body {
   flex-shrink: 0;
 }
 
-/* From & To Row */
+/* From & To Row (2-Column Responsive) */
 .ticket-parties-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 8px;
+  margin-bottom: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ticket-party-card {
   background: #F8FAFC;
   border: 1px solid #F1F5F9;
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 10px 8px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .ticket-party-role {
@@ -1157,48 +1166,54 @@ body {
 
 .ticket-party-body {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
 }
 
 .party-icon-purple, .party-icon-dest {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .party-text-info {
-  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
 }
 
 .party-full-name {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   color: var(--text-primary);
   text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.25;
 }
 
 .party-acct-mask {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   font-weight: 600;
-  margin-top: 1px;
+  margin-top: 2px;
+  word-break: break-all;
 }
 
 /* Details List */
 .ticket-details-block {
   border-top: 1px solid #F1F5F9;
-  padding-top: 14px;
-  margin-bottom: 18px;
+  padding-top: 12px;
+  margin-bottom: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ticket-detail-row {
@@ -1217,7 +1232,7 @@ body {
   font-weight: 800;
   color: var(--text-primary);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 
 /* Bottom Footer */
@@ -1225,9 +1240,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   border-top: 1px solid #F1F5F9;
-  padding-top: 14px;
+  padding-top: 12px;
+  padding-bottom: 4px;
 }
 
 .processed-tag {
@@ -1240,7 +1256,7 @@ body {
 
 .footer-v-divider {
   width: 1px;
-  height: 28px;
+  height: 26px;
   background: var(--border-light);
 }
 
@@ -1617,37 +1633,43 @@ body {
 /* ================================================= */
 .mobile-push-notification {
   position: fixed;
-  top: 14px;
+  top: 16px;
+  top: max(16px, env(safe-area-inset-top, 16px));
   left: 12px;
   right: 12px;
-  max-width: 440px;
+  max-width: 430px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: #FFFFFF !important;
   border-radius: 18px;
-  border: 1.5px solid rgba(2, 132, 199, 0.25);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(2, 132, 199, 0.12);
+  border: 1.5px solid #0284C7 !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.28), 0 4px 16px rgba(2, 132, 199, 0.25) !important;
   padding: 12px 14px;
   display: flex;
   align-items: center;
   gap: 12px;
-  z-index: 10000000;
-  transform: translateY(-130%);
+  z-index: 2147483647 !important;
+  transform: translateY(-160%);
   opacity: 0;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
   pointer-events: none;
 }
 
 .mobile-push-notification.is-visible {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  animation: pushDropBounce 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pushDropBounce {
+  0% { transform: translateY(-130%); opacity: 0; }
+  65% { transform: translateY(6px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 
 .push-icon-circle {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   background: var(--primary-surface);
   border: 1px solid var(--primary-subtle);
@@ -1655,12 +1677,30 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  position: relative;
 }
 
 .push-logo-img {
   width: 28px;
   height: auto;
   object-fit: contain;
+}
+
+.push-check-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #10B981;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #FFFFFF;
 }
 
 .push-text-col {
@@ -1677,7 +1717,7 @@ body {
 
 .push-app-name {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary-dark);
 }
 
@@ -1689,7 +1729,7 @@ body {
 
 .push-body-msg {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   line-height: 1.3;
 }
@@ -1857,14 +1897,16 @@ body {
 }
 
 .receipt-stage-container {
-  padding: 16px 14px 60px !important;
+  padding: 12px 14px 130px !important;
+  padding-bottom: max(130px, calc(100px + env(safe-area-inset-bottom, 24px))) !important;
   max-width: 420px;
   margin: 0 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   align-items: stretch;
+  box-sizing: border-box;
 }
 
 #receiptScreen .ticket-receipt-card {

@@ -194,6 +194,7 @@ class TPayPortal {
     // PIN Keypad
     this.keypadButtons.forEach(btn => {
       btn.addEventListener("click", () => {
+        this.unlockAudio();
         const val = btn.getAttribute("data-val");
         this.inputPinDigit(val);
       });
@@ -201,6 +202,7 @@ class TPayPortal {
 
     this.btnDeletePin.addEventListener("click", () => this.deletePinDigit());
     this.btnBiometricAuth.addEventListener("click", () => {
+      this.unlockAudio();
       this.enteredPin = REQUIRED_PIN;
       this.updatePinDots();
       setTimeout(() => this.unlockDashboard(), 200);
@@ -322,7 +324,10 @@ class TPayPortal {
 
     // Execute Send
     if (this.btnExecuteSend) {
-      this.btnExecuteSend.addEventListener("click", () => this.processSendMoney());
+      this.btnExecuteSend.addEventListener("click", () => {
+        this.unlockAudio();
+        this.processSendMoney();
+      });
     }
 
     // Back from Send Screen
@@ -620,17 +625,43 @@ class TPayPortal {
     }, 800);
   }
 
-  // --- Banking Ring / Bell Chime Sound + Haptic Vibration ---
-  playSuccessChime() {
+  // --- Mobile Audio Unlocker (Direct User Gesture) ---
+  unlockAudio() {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-
-      if (ctx.state === 'suspended') {
-        ctx.resume();
+      if (!this.audioCtx) {
+        this.audioCtx = new AudioCtx();
       }
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+      // Prime mobile audio session with a micro silent tick
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      gain.gain.setValueAtTime(0.0001, this.audioCtx.currentTime);
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+      osc.start(0);
+      osc.stop(this.audioCtx.currentTime + 0.04);
+    } catch (e) {
+      console.warn("Audio unlock error:", e);
+    }
+  }
 
+  // --- Banking Ring / Bell Chime Sound + Haptic Vibration ---
+  playSuccessChime() {
+    try {
+      if (!this.audioCtx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) this.audioCtx = new AudioCtx();
+      }
+      if (this.audioCtx && this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+      if (!this.audioCtx) return;
+
+      const ctx = this.audioCtx;
       const now = ctx.currentTime;
 
       // Helper to synthesize physical bell harmonics
@@ -652,15 +683,17 @@ class TPayPortal {
         osc.stop(startTime + duration);
       };
 
-      // 3-note melodic crystal fintech payment chime (Ding-dong-ring)
-      playBellNote(659.25, now, 0.45, 0.32);           // Note 1: E5
-      playBellNote(830.61, now + 0.12, 0.55, 0.35);     // Note 2: G#5
-      playBellNote(1046.50, now + 0.24, 0.90, 0.40);    // Note 3: C6
-      playBellNote(1318.51, now + 0.26, 0.95, 0.25);    // Harmonic: E6
+      // 4-note melodic crystal fintech payment chime (Ding-dong-ring)
+      playBellNote(659.25, now, 0.45, 0.35);           // Note 1: E5
+      playBellNote(830.61, now + 0.12, 0.55, 0.38);     // Note 2: G#5
+      playBellNote(1046.50, now + 0.24, 0.90, 0.45);    // Note 3: C6
+      playBellNote(1318.51, now + 0.26, 0.95, 0.30);    // Harmonic: E6
 
-      // Mobile phone vibration ring pattern (120ms buzz, 60ms pause, 180ms buzz)
+      // Mobile phone vibration ring pattern (140ms buzz, 60ms pause, 200ms buzz)
       if (navigator.vibrate) {
-        navigator.vibrate([120, 60, 180]);
+        try {
+          navigator.vibrate([140, 60, 200]);
+        } catch (e) {}
       }
     } catch (err) {
       console.warn("Audio chime error:", err);
@@ -682,13 +715,39 @@ class TPayPortal {
 
     if (this.mobilePushNotification) {
       if (this.pushTimeout) clearTimeout(this.pushTimeout);
+      this.mobilePushNotification.classList.remove("is-visible");
+      // Force layout reflow so animation re-triggers
+      void this.mobilePushNotification.offsetWidth;
       this.mobilePushNotification.classList.add("is-visible");
+
+      // Also trigger native browser Notification if permitted
+      if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+          try {
+            new Notification("TPay • Instant Transfer", {
+              body: msg,
+              icon: "tpay_logo.png"
+            });
+          } catch (e) {}
+        } else if (Notification.permission !== "denied") {
+          try {
+            Notification.requestPermission().then(perm => {
+              if (perm === "granted") {
+                new Notification("TPay • Instant Transfer", {
+                  body: msg,
+                  icon: "tpay_logo.png"
+                });
+              }
+            });
+          } catch (e) {}
+        }
+      }
 
       this.pushTimeout = setTimeout(() => {
         if (this.mobilePushNotification) {
           this.mobilePushNotification.classList.remove("is-visible");
         }
-      }, 5000);
+      }, 6500);
     }
   }
 

@@ -13,20 +13,6 @@
 </head>
 <body>
 
-  <!-- Top Real-time Mobile Push Notification Banner -->
-  <div class="mobile-push-notification" id="mobilePushNotification">
-    <div class="push-icon-circle">
-      <img src="tpay_logo.png" alt="TPay" class="push-logo-img">
-    </div>
-    <div class="push-text-col">
-      <div class="push-title-row">
-        <span class="push-app-name">TPay • Instant Transfer</span>
-        <span class="push-time-tag">Just now</span>
-      </div>
-      <div class="push-body-msg" id="pushBodyMsg">Payment sent successfully!</div>
-    </div>
-  </div>
-
   <!-- ============================================================== -->
   <!-- 1. STAGE ONE: 100% FULLSCREEN SPLASH SCREEN                    -->
   <!-- ============================================================== -->
@@ -483,6 +469,21 @@
 
     </div>
   </section>
+
+  <!-- Top Real-time Mobile Push Notification Banner (Placed at the end of body for top stacking) -->
+  <div class="mobile-push-notification" id="mobilePushNotification">
+    <div class="push-icon-circle">
+      <img src="tpay_logo.png" alt="TPay" class="push-logo-img">
+      <span class="push-check-badge">✓</span>
+    </div>
+    <div class="push-text-col">
+      <div class="push-title-row">
+        <span class="push-app-name">TPay • Instant Transfer</span>
+        <span class="push-time-tag">Just now</span>
+      </div>
+      <div class="push-body-msg" id="pushBodyMsg">Payment sent successfully!</div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
