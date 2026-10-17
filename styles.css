@@ -1841,3 +1841,50 @@ body {
     font-size: 13px !important;
   }
 }
+
+/* ================================================= */
+/* 4. STAGE FOUR: RECEIPT STAGE SCREEN (100% MOBILE) */
+/* ================================================= */
+#receiptScreen {
+  flex-direction: column;
+  background: #F8FAFC;
+  min-height: 100dvh;
+  min-height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.receipt-stage-container {
+  padding: 16px 14px 60px !important;
+  max-width: 420px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+}
+
+#receiptScreen .ticket-receipt-card {
+  box-shadow: 0 12px 36px rgba(91, 66, 198, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  margin: 0 auto;
+  width: 100%;
+}
+
+#receiptScreen .ticket-notch {
+  background: #F8FAFC !important;
+}
+
+#receiptScreen .ticket-dots-row span {
+  background: #CBD5E1 !important;
+}
+
+#receiptScreen .ticket-actions-bar {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}

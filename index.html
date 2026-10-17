@@ -360,12 +360,18 @@
 </section>
 
   <!-- ============================================================== -->
-  <!-- 3. EXACT REALISTIC RAQAMI / RAAST TICKET RECEIPT MODAL         -->
+  <!-- 4. STAGE FOUR: 100% MOBILE FULLSCREEN TRANSACTION RECEIPT     -->
   <!-- ============================================================== -->
-  <div class="modal-backdrop-layer" id="modalOfficialReceipt">
-    <div class="modal-content-box receipt-modal-box">
-      <div class="modal-mobile-handle"></div>
+  <section class="stage-screen" id="receiptScreen">
+    <div class="stage-header">
+      <button class="btn-back" id="btnBackFromReceipt">
+        <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
+        <span>Dashboard</span>
+      </button>
+      <h2 class="stage-title">Transaction Receipt</h2>
+    </div>
 
+    <div class="stage-content receipt-stage-container">
       <!-- Exact Replica of User's Ticket Receipt -->
       <div class="ticket-receipt-card" id="officialVoucher">
         
@@ -476,7 +482,7 @@
       </div>
 
     </div>
-  </div>
+  </section>
 
   <script src="app.js"></script>
 </body>

@@ -151,6 +151,8 @@ class TPayPortal {
     this.modalOfficialReceipt = document.getElementById("modalOfficialReceipt");
 
     // Ticket Receipt Elements (Raqmi style)
+    this.receiptScreen = document.getElementById("receiptScreen");
+    this.btnBackFromReceipt = document.getElementById("btnBackFromReceipt");
     this.receiptDispAmount = document.getElementById("receiptDispAmount");
     this.receiptDispTime = document.getElementById("receiptDispTime");
     this.receiptDispRecipient = document.getElementById("receiptDispRecipient");
@@ -159,6 +161,7 @@ class TPayPortal {
     this.receiptDispChannel = document.getElementById("receiptDispChannel");
     this.btnPrintReceipt = document.getElementById("btnPrintReceipt");
     this.btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
+
     // Top Push Notification
     this.mobilePushNotification = document.getElementById("mobilePushNotification");
     this.pushBodyMsg = document.getElementById("pushBodyMsg");
@@ -334,10 +337,15 @@ class TPayPortal {
       });
     }
 
-    // Close Receipt Modal
+    // Return to Dashboard from Receipt
     if (this.btnCloseReceiptModal) {
       this.btnCloseReceiptModal.addEventListener("click", () => {
-        this.closeModal(this.modalOfficialReceipt);
+        this.showScreen("dashboardScreen");
+      });
+    }
+    if (this.btnBackFromReceipt) {
+      this.btnBackFromReceipt.addEventListener("click", () => {
+        this.showScreen("dashboardScreen");
       });
     }
   }
@@ -375,8 +383,11 @@ class TPayPortal {
     const target = document.getElementById(screenId);
     if (target) {
       target.classList.add("is-active-stage");
+      target.scrollTop = 0;
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
+    if (document.body) document.body.scrollTop = 0;
+    if (document.documentElement) document.documentElement.scrollTop = 0;
   }
 
   // --- PIN / Password Logic (Pass: 2009) ---
@@ -485,6 +496,22 @@ class TPayPortal {
           <div class="act-tag-completed">Completed</div>
         </div>
       `;
+
+      item.style.cursor = "pointer";
+      item.addEventListener("click", () => {
+        const cleanAmt = tx.amount.replace('-', '').replace('+', '').trim();
+        const partyName = tx.title.replace('Transfer to ', '').replace('Received from ', '');
+        this.showReceiptModal({
+          amountStr: `Rs. ${cleanAmt.replace('.00', '')}`,
+          timestamp: tx.date,
+          recipient: partyName.toUpperCase(),
+          accountMask: "*2009",
+          bank: tx.meta.split('•')[0].trim(),
+          ref: tx.id,
+          channel: "Raast"
+        });
+      });
+
       this.activityFeedContainer.appendChild(item);
     });
 
@@ -574,16 +601,13 @@ class TPayPortal {
       if (this.sendRecipientAccount) this.sendRecipientAccount.value = "";
       if (this.sendAmountField) this.sendAmountField.value = "";
 
-      // Return to dashboard
-      this.showScreen("dashboardScreen");
-
       // Play authentic banking bell / ring chime & trigger mobile vibration
       this.playSuccessChime();
 
       // Show top push notification banner
       this.showPushNotification(`₨ ${this.formatCurrency(amount).replace('.00', '')} successfully sent to ${recipientName.toUpperCase()} via Raast!`);
 
-      // Show realistic Raast/Raqmi slip/receipt modal
+      // Switch directly to receipt voucher screen!
       this.showReceiptModal({
         amountStr: `Rs. ${this.formatCurrency(amount).replace('.00', '')}`,
         timestamp: formattedTimestamp,
@@ -677,12 +701,9 @@ class TPayPortal {
     if (this.receiptDispRef) this.receiptDispRef.textContent = data.ref;
     if (this.receiptDispChannel) this.receiptDispChannel.textContent = data.channel;
 
-    if (!this.modalOfficialReceipt) {
-      this.modalOfficialReceipt = document.getElementById("modalOfficialReceipt");
-    }
-    if (this.modalOfficialReceipt) {
-      this.openModal(this.modalOfficialReceipt);
-    }
+    // Switch stage screen directly so it is 100% visible and centered on mobile
+    this.showScreen("receiptScreen");
+
     if (window.lucide) {
       lucide.createIcons();
     }
