@@ -51,6 +51,7 @@ class TPayPortal {
     this.isBalanceHidden = true;
     this.splashDuration = 1300; // Fast smooth splash (1.3 seconds)
     this.splashTimer = null;
+    this.currentSendStep = 1;
 
     this.initElements();
     this.bindEvents();
@@ -138,14 +139,47 @@ class TPayPortal {
     this.bottomNavCards = document.getElementById("bottomNavCards");
     this.bottomNavProfile = document.getElementById("bottomNavProfile");
 
-    // Send Form & Navigation
+    // Send Form & Multi-step Wizard Navigation
     this.btnBackFromSend = document.getElementById("btnBackFromSend");
+    this.btnBackSendLabel = document.getElementById("btnBackSendLabel");
+    this.sendStageTitle = document.getElementById("sendStageTitle");
+    this.sendWizardTrack = document.getElementById("sendWizardTrack");
+    this.sendAvailBalDisplay = document.getElementById("sendAvailBalDisplay");
+
+    // Stepper indicators
+    this.stepIndicators = [
+      document.getElementById("stepIndicator1"),
+      document.getElementById("stepIndicator2"),
+      document.getElementById("stepIndicator3")
+    ];
+    this.stepConnectors = [
+      document.getElementById("stepConnector1"),
+      document.getElementById("stepConnector2")
+    ];
+
+    // Slide 1 Controls
+    this.sendAmountField = document.getElementById("sendAmountField");
+    this.btnStep1Next = document.getElementById("btnStep1Next");
+
+    // Slide 2 Controls
+    this.step2AmountBadge = document.getElementById("step2AmountBadge");
+    this.btnEditAmountFromStep2 = document.getElementById("btnEditAmountFromStep2");
     this.sendDestinationBank = document.getElementById("sendDestinationBank");
     this.sendRecipientName = document.getElementById("sendRecipientName");
     this.sendRecipientAccount = document.getElementById("sendRecipientAccount");
-    this.sendAmountField = document.getElementById("sendAmountField");
     this.sendPurposeSelect = document.getElementById("sendPurposeSelect");
+    this.btnStep2Back = document.getElementById("btnStep2Back");
+    this.btnStep2Next = document.getElementById("btnStep2Next");
+
+    // Slide 3 Controls
+    this.reviewDispAmount = document.getElementById("reviewDispAmount");
+    this.reviewDispRecipient = document.getElementById("reviewDispRecipient");
+    this.reviewDispAccount = document.getElementById("reviewDispAccount");
+    this.reviewDispBank = document.getElementById("reviewDispBank");
+    this.reviewDispPurpose = document.getElementById("reviewDispPurpose");
+    this.reviewDispTotal = document.getElementById("reviewDispTotal");
     this.btnExecuteSend = document.getElementById("btnExecuteSend");
+    this.btnStep3Back = document.getElementById("btnStep3Back");
 
     // Modals
     this.modalOfficialReceipt = document.getElementById("modalOfficialReceipt");
@@ -313,16 +347,93 @@ class TPayPortal {
       });
     });
 
-    // Quick Send Amounts
-    document.querySelectorAll("#sendScreen [data-amt]").forEach(chip => {
+    // Quick Send Amounts (Slide 1)
+    document.querySelectorAll("#sendQuickAmounts .quick-chip").forEach(chip => {
       chip.addEventListener("click", () => {
+        this.unlockAudio();
+        document.querySelectorAll("#sendQuickAmounts .quick-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
         if (this.sendAmountField) {
           this.sendAmountField.value = chip.getAttribute("data-amt");
         }
       });
     });
 
-    // Execute Send
+    if (this.sendAmountField) {
+      this.sendAmountField.addEventListener("input", () => {
+        const val = this.sendAmountField.value;
+        document.querySelectorAll("#sendQuickAmounts .quick-chip").forEach(c => {
+          if (c.getAttribute("data-amt") === val) {
+            c.classList.add("active");
+          } else {
+            c.classList.remove("active");
+          }
+        });
+      });
+    }
+
+    // Step 1 -> Step 2
+    if (this.btnStep1Next) {
+      this.btnStep1Next.addEventListener("click", () => {
+        this.unlockAudio();
+        const amt = parseFloat(this.sendAmountField ? this.sendAmountField.value : "0");
+        if (!amt || amt <= 0) {
+          alert("Please enter a valid transfer amount.");
+          if (this.sendAmountField) this.sendAmountField.focus();
+          return;
+        }
+        if (amt > this.balance) {
+          alert("Insufficient available balance. Your balance is PKR " + this.formatCurrency(this.balance));
+          return;
+        }
+        this.goToStep(2);
+      });
+    }
+
+    // Step 2 -> Step 1 (Back / Edit)
+    if (this.btnStep2Back) {
+      this.btnStep2Back.addEventListener("click", () => {
+        this.unlockAudio();
+        this.goToStep(1);
+      });
+    }
+    if (this.btnEditAmountFromStep2) {
+      this.btnEditAmountFromStep2.addEventListener("click", () => {
+        this.unlockAudio();
+        this.goToStep(1);
+      });
+    }
+
+    // Step 2 -> Step 3
+    if (this.btnStep2Next) {
+      this.btnStep2Next.addEventListener("click", () => {
+        this.unlockAudio();
+        const recipientName = (this.sendRecipientName ? this.sendRecipientName.value.trim() : "");
+        const recipientAccount = (this.sendRecipientAccount ? this.sendRecipientAccount.value.trim() : "");
+
+        if (!recipientName) {
+          alert("Please enter the Beneficiary / Receiver Full Name.");
+          if (this.sendRecipientName) this.sendRecipientName.focus();
+          return;
+        }
+        if (!recipientAccount) {
+          alert("Please enter recipient account number or mobile wallet.");
+          if (this.sendRecipientAccount) this.sendRecipientAccount.focus();
+          return;
+        }
+        this.goToStep(3);
+      });
+    }
+
+    // Step 3 -> Step 2 (Back / Edit)
+    if (this.btnStep3Back) {
+      this.btnStep3Back.addEventListener("click", () => {
+        this.unlockAudio();
+        this.goToStep(2);
+      });
+    }
+
+    // Execute Send on Step 3
     if (this.btnExecuteSend) {
       this.btnExecuteSend.addEventListener("click", () => {
         this.unlockAudio();
@@ -330,9 +441,18 @@ class TPayPortal {
       });
     }
 
-    // Back from Send Screen
+    // Header Back button dynamically navigates steps
     if (this.btnBackFromSend) {
-      this.btnBackFromSend.addEventListener("click", () => this.showScreen("dashboardScreen"));
+      this.btnBackFromSend.addEventListener("click", () => {
+        this.unlockAudio();
+        if (this.currentSendStep === 1) {
+          this.showScreen("dashboardScreen");
+        } else if (this.currentSendStep === 2) {
+          this.goToStep(1);
+        } else if (this.currentSendStep === 3) {
+          this.goToStep(2);
+        }
+      });
     }
 
     // Print / Save Receipt
@@ -380,6 +500,84 @@ class TPayPortal {
     this.showScreen("lockScreen");
   }
 
+  // --- Multi-Step Send Money Wizard Engine ---
+  goToStep(step) {
+    this.currentSendStep = step;
+    if (this.sendWizardTrack) {
+      this.sendWizardTrack.style.transform = `translateX(-${(step - 1) * 100}%)`;
+    }
+
+    // Update Stepper Visuals
+    if (this.stepIndicators) {
+      this.stepIndicators.forEach((ind, idx) => {
+        if (!ind) return;
+        const circle = ind.querySelector(".step-num-circle");
+        ind.classList.remove("active", "completed");
+        if (idx + 1 < step) {
+          ind.classList.add("completed");
+          if (circle) circle.textContent = "✓";
+        } else if (idx + 1 === step) {
+          ind.classList.add("active");
+          if (circle) circle.textContent = (idx + 1).toString();
+        } else {
+          if (circle) circle.textContent = (idx + 1).toString();
+        }
+      });
+    }
+
+    if (this.stepConnectors) {
+      this.stepConnectors.forEach((conn, idx) => {
+        if (!conn) return;
+        if (step > idx + 1) {
+          conn.classList.add("active");
+        } else {
+          conn.classList.remove("active");
+        }
+      });
+    }
+
+    // Header Back button and Title
+    if (this.btnBackSendLabel) {
+      if (step === 1) this.btnBackSendLabel.textContent = "Dashboard";
+      else if (step === 2) this.btnBackSendLabel.textContent = "Amount";
+      else if (step === 3) this.btnBackSendLabel.textContent = "Recipient";
+    }
+
+    if (this.sendStageTitle) {
+      if (step === 1) this.sendStageTitle.textContent = "Send Money";
+      else if (step === 2) this.sendStageTitle.textContent = "Recipient Details";
+      else if (step === 3) this.sendStageTitle.textContent = "Confirm Transfer";
+    }
+
+    // Update details when arriving on Step 2 or 3
+    const amt = parseFloat(this.sendAmountField ? this.sendAmountField.value : "0") || 0;
+    if (this.step2AmountBadge) {
+      this.step2AmountBadge.textContent = `₨ ${this.formatCurrency(amt)}`;
+    }
+
+    if (step === 3) {
+      const recipientName = (this.sendRecipientName ? this.sendRecipientName.value.trim() : "") || "TEMOOR SHAH";
+      const recipientAccount = (this.sendRecipientAccount ? this.sendRecipientAccount.value.trim() : "") || "0300-8822054";
+      const bank = (this.sendDestinationBank ? this.sendDestinationBank.value : "Easypaisa");
+      const purpose = (this.sendPurposeSelect ? this.sendPurposeSelect.value : "Family / Personal Transfer");
+
+      if (this.reviewDispAmount) this.reviewDispAmount.textContent = `₨ ${this.formatCurrency(amt)}`;
+      if (this.reviewDispRecipient) this.reviewDispRecipient.textContent = recipientName.toUpperCase();
+      if (this.reviewDispAccount) this.reviewDispAccount.textContent = recipientAccount;
+      if (this.reviewDispBank) this.reviewDispBank.textContent = bank;
+      if (this.reviewDispPurpose) this.reviewDispPurpose.textContent = purpose;
+      if (this.reviewDispTotal) this.reviewDispTotal.textContent = `₨ ${this.formatCurrency(amt)}`;
+    }
+
+    // Scroll container to top
+    if (this.sendScreen) this.sendScreen.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+
   // --- Strict Stage Switcher ---
   showScreen(screenId) {
     document.querySelectorAll(".stage-screen").forEach(scr => {
@@ -390,9 +588,21 @@ class TPayPortal {
       target.classList.add("is-active-stage");
       target.scrollTop = 0;
     }
+
+    if (screenId === "sendScreen") {
+      if (this.sendAvailBalDisplay) {
+        this.sendAvailBalDisplay.textContent = this.formatCurrency(this.balance);
+      }
+      this.goToStep(1);
+    }
+
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (document.body) document.body.scrollTop = 0;
     if (document.documentElement) document.documentElement.scrollTop = 0;
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   // --- PIN / Password Logic (Pass: 2009) ---
@@ -561,7 +771,7 @@ class TPayPortal {
     setTimeout(() => {
       if (this.btnExecuteSend) {
         this.btnExecuteSend.disabled = false;
-        this.btnExecuteSend.innerHTML = `<span>Proceed & Send</span> <i data-lucide="arrow-right"></i>`;
+        this.btnExecuteSend.innerHTML = `<i data-lucide="send" style="width: 18px; height: 18px;"></i> <span>Send Payment Now</span>`;
       }
 
       // Deduct balance
@@ -605,6 +815,10 @@ class TPayPortal {
       if (this.sendRecipientName) this.sendRecipientName.value = "";
       if (this.sendRecipientAccount) this.sendRecipientAccount.value = "";
       if (this.sendAmountField) this.sendAmountField.value = "";
+      document.querySelectorAll("#sendQuickAmounts .quick-chip").forEach(c => c.classList.remove("active"));
+
+      // Reset wizard back to Step 1 for next time
+      this.goToStep(1);
 
       // Play authentic banking bell / ring chime & trigger mobile vibration
       this.playSuccessChime();
@@ -622,7 +836,7 @@ class TPayPortal {
         ref: refId,
         channel: "Raast"
       });
-    }, 800);
+    }, 750);
   }
 
   // --- Mobile Audio Unlocker (Direct User Gesture) ---

@@ -217,133 +217,299 @@
 
 
   <section class="stage-screen" id="sendScreen">
-  <div class="stage-header">
-    <button class="btn-back" id="btnBackFromSend"><i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i> Back</button>
-    <h2 class="stage-title">Send Money</h2>
-  </div>
-  <div class="stage-content">
-    <!-- Quick Bank Filter Badges -->
-    <div class="form-item-wrap">
-      <div class="form-label-row">
-        <label class="form-label-title">Popular Wallets & Banks</label>
-        <span class="form-label-hint">Tap to select</span>
-      </div>
-      <div class="chips-row-wrap" id="quickBankBadges">
-        <span class="quick-chip active" data-quickbank="Easypaisa">
-          <span class="bank-dot ep-dot"></span>Easypaisa
-        </span>
-        <span class="quick-chip" data-quickbank="JazzCash">
-          <span class="bank-dot jc-dot"></span>JazzCash
-        </span>
-        <span class="quick-chip" data-quickbank="Raqmi Islamic Digital Bank">
-          <span class="bank-dot rq-dot"></span>Raqmi Bank
-        </span>
-        <span class="quick-chip" data-quickbank="SadaPay">
-          <span class="bank-dot sp-dot"></span>SadaPay
-        </span>
-        <span class="quick-chip" data-quickbank="NayaPay">
-          <span class="bank-dot np-dot"></span>NayaPay
-        </span>
-        <span class="quick-chip" data-quickbank="Meezan Bank">
-          <span class="bank-dot mz-dot"></span>Meezan Bank
-        </span>
-        <span class="quick-chip" data-quickbank="Habib Bank Limited (HBL)">
-          <span class="bank-dot hbl-dot"></span>HBL
-        </span>
-        <span class="quick-chip" data-quickbank="Bank Alfalah">
-          <span class="bank-dot ba-dot"></span>Bank Alfalah
-        </span>
+    <!-- Header with Dynamic Back & Title -->
+    <div class="stage-header">
+      <button class="btn-back" id="btnBackFromSend">
+        <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
+        <span id="btnBackSendLabel">Back</span>
+      </button>
+      <h2 class="stage-title" id="sendStageTitle">Send Money</h2>
+    </div>
+
+    <!-- 3-Step Visual Progress Stepper -->
+    <div class="send-stepper-wrap">
+      <div class="send-stepper-bar">
+        <div class="step-indicator-item active" id="stepIndicator1">
+          <div class="step-num-circle">1</div>
+          <span class="step-num-text">Amount</span>
+        </div>
+        <div class="step-connector-line" id="stepConnector1"></div>
+        <div class="step-indicator-item" id="stepIndicator2">
+          <div class="step-num-circle">2</div>
+          <span class="step-num-text">Recipient</span>
+        </div>
+        <div class="step-connector-line" id="stepConnector2"></div>
+        <div class="step-indicator-item" id="stepIndicator3">
+          <div class="step-num-circle">3</div>
+          <span class="step-num-text">Confirm</span>
+        </div>
       </div>
     </div>
-    <!-- Comprehensive Destination Bank / Wallet Selector -->
-    <div class="form-item-wrap">
-      <label class="form-label-title" for="sendDestinationBank">Select Bank / Microfinance / Wallet (All Pakistan)</label>
-      <div class="styled-select-wrap">
-        <i data-lucide="landmark" class="select-lead-icon"></i>
-        <select id="sendDestinationBank" class="custom-input custom-bank-select">
-          <optgroup label="⚡ Mobile Wallets & Digital Microfinance Banks">
-            <option value="Easypaisa" selected>Easypaisa (Telenor Microfinance Bank)</option>
-            <option value="JazzCash">JazzCash (Mobilink Microfinance Bank)</option>
-            <option value="Raqmi Islamic Digital Bank">Raqmi Islamic Digital Bank</option>
-            <option value="SadaPay">SadaPay (Mastercard Wallet)</option>
-            <option value="NayaPay">NayaPay (Visa Digital Wallet)</option>
-            <option value="TPay Internal Wallet">TPay Wallet (Instant 0-Fee)</option>
-            <option value="U Microfinance Bank (UPaisa)">UPaisa (U Microfinance Bank)</option>
-            <option value="Khushhali Microfinance Bank">Khushhali Microfinance Bank</option>
-            <option value="FINCA Microfinance Bank">FINCA Microfinance Bank</option>
-            <option value="Mobilink Microfinance Bank">Mobilink Microfinance Bank</option>
-          </optgroup>
-          <optgroup label="🏦 Major Commercial & Islamic Banks">
-            <option value="Meezan Bank">Meezan Bank Limited</option>
-            <option value="Habib Bank Limited (HBL)">Habib Bank Limited (HBL)</option>
-            <option value="Bank Alfalah">Bank Alfalah Limited</option>
-            <option value="United Bank Limited (UBL)">United Bank Limited (UBL)</option>
-            <option value="MCB Bank Limited">MCB Bank Limited</option>
-            <option value="Allied Bank Limited (ABL)">Allied Bank Limited (ABL)</option>
-            <option value="Faysal Bank">Faysal Bank Limited</option>
-            <option value="Standard Chartered Bank">Standard Chartered Bank Pakistan</option>
-            <option value="Bank of Punjab (BOP)">Bank of Punjab (BOP)</option>
-            <option value="Askari Bank">Askari Bank Limited</option>
-            <option value="BankIslami">BankIslami Pakistan Limited</option>
-            <option value="JS Bank">JS Bank Limited</option>
-            <option value="Soneri Bank">Soneri Bank Limited</option>
-            <option value="Dubai Islamic Bank">Dubai Islamic Bank (DIB)</option>
-            <option value="Al Baraka Bank">Al Baraka Bank Pakistan</option>
-            <option value="Bank of Khyber">Bank of Khyber</option>
-            <option value="Sindh Bank">Sindh Bank Limited</option>
-            <option value="Silkbank">Silkbank Limited</option>
-            <option value="Summit Bank">Summit Bank Limited</option>
-            <option value="Habib Metropolitan Bank">Habib Metropolitan Bank</option>
-            <option value="National Bank of Pakistan (NBP)">National Bank of Pakistan (NBP)</option>
-          </optgroup>
-        </select>
-        <i data-lucide="chevron-down" class="select-trail-icon"></i>
+
+    <!-- Multi-Step Slider Viewport -->
+    <div class="send-wizard-viewport">
+      <div class="send-wizard-track" id="sendWizardTrack">
+
+        <!-- =================== SLIDE 1: AMOUNT =================== -->
+        <div class="send-step-slide" id="sendSlide1">
+          <div class="stage-content">
+            <!-- Available balance banner -->
+            <div class="send-avail-balance-card">
+              <div class="bal-label-row">
+                <span class="bal-tag-icon"><i data-lucide="wallet" style="width: 14px; height: 14px;"></i></span>
+                <span>Available Balance</span>
+              </div>
+              <div class="bal-val-text">PKR <span id="sendAvailBalDisplay">500,000.00</span></div>
+            </div>
+
+            <!-- Big Amount Card -->
+            <div class="amount-hero-card">
+              <span class="amount-hero-label">Enter Transfer Amount</span>
+              <div class="amount-input-box-row">
+                <span class="currency-symbol">₨</span>
+                <input type="number" id="sendAmountField" class="big-amount-input" placeholder="0" min="1" step="any" inputmode="decimal">
+              </div>
+              <div class="amount-raast-badge">
+                <i data-lucide="zap" style="width: 13px; height: 13px; color: #0284C7;"></i>
+                <span>Instant Raast Transfer • 0 Fee</span>
+              </div>
+            </div>
+
+            <!-- Quick Amount Chips -->
+            <div class="form-item-wrap">
+              <label class="form-label-title">Quick Amounts</label>
+              <div class="chips-row-wrap" id="sendQuickAmounts">
+                <span class="quick-chip" data-amt="260">₨ 260</span>
+                <span class="quick-chip" data-amt="500">₨ 500</span>
+                <span class="quick-chip" data-amt="1000">₨ 1,000</span>
+                <span class="quick-chip" data-amt="5000">₨ 5,000</span>
+                <span class="quick-chip" data-amt="10000">₨ 10,000</span>
+                <span class="quick-chip" data-amt="25000">₨ 25,000</span>
+                <span class="quick-chip" data-amt="50000">₨ 50,000</span>
+              </div>
+            </div>
+
+            <!-- Next Button for Slide 1 -->
+            <button class="btn-submit-sky" id="btnStep1Next">
+              <span>Next: Recipient Details</span>
+              <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- =================== SLIDE 2: RECIPIENT =================== -->
+        <div class="send-step-slide" id="sendSlide2">
+          <div class="stage-content">
+            <!-- Selected Amount Reminder -->
+            <div class="selected-amount-reminder">
+              <span class="reminder-label">Sending Amount:</span>
+              <span class="reminder-val" id="step2AmountBadge">₨ 0.00</span>
+              <button class="btn-edit-amount-pill" id="btnEditAmountFromStep2" title="Change amount">Edit</button>
+            </div>
+
+            <!-- Quick Beneficiaries -->
+            <div class="form-item-wrap">
+              <label class="form-label-title">Quick Beneficiaries</label>
+              <div class="chips-row-wrap" id="contactsRow">
+                <span class="quick-chip" data-name="TEMOOR SHAH" data-iban="0300-8822054" data-bank="Easypaisa">TEMOOR SHAH</span>
+                <span class="quick-chip" data-name="Ahmed Raza" data-iban="0312-9988441" data-bank="JazzCash">Ahmed Raza</span>
+                <span class="quick-chip" data-name="Fatima Noor" data-iban="PK92 MEZN 0021 4455" data-bank="Meezan Bank">Fatima Noor</span>
+              </div>
+            </div>
+
+            <!-- Quick Bank Filter Badges -->
+            <div class="form-item-wrap">
+              <div class="form-label-row">
+                <label class="form-label-title">Popular Wallets &amp; Banks</label>
+                <span class="form-label-hint">Tap to select</span>
+              </div>
+              <div class="chips-row-wrap" id="quickBankBadges">
+                <span class="quick-chip active" data-quickbank="Easypaisa">
+                  <span class="bank-dot ep-dot"></span>Easypaisa
+                </span>
+                <span class="quick-chip" data-quickbank="JazzCash">
+                  <span class="bank-dot jc-dot"></span>JazzCash
+                </span>
+                <span class="quick-chip" data-quickbank="Raqmi Islamic Digital Bank">
+                  <span class="bank-dot rq-dot"></span>Raqmi Bank
+                </span>
+                <span class="quick-chip" data-quickbank="SadaPay">
+                  <span class="bank-dot sp-dot"></span>SadaPay
+                </span>
+                <span class="quick-chip" data-quickbank="NayaPay">
+                  <span class="bank-dot np-dot"></span>NayaPay
+                </span>
+                <span class="quick-chip" data-quickbank="Meezan Bank">
+                  <span class="bank-dot mz-dot"></span>Meezan Bank
+                </span>
+                <span class="quick-chip" data-quickbank="Habib Bank Limited (HBL)">
+                  <span class="bank-dot hbl-dot"></span>HBL
+                </span>
+                <span class="quick-chip" data-quickbank="Bank Alfalah">
+                  <span class="bank-dot ba-dot"></span>Bank Alfalah
+                </span>
+              </div>
+            </div>
+
+            <!-- Select Bank / Wallet -->
+            <div class="form-item-wrap">
+              <label class="form-label-title" for="sendDestinationBank">Destination Bank / Wallet (All Pakistan)</label>
+              <div class="styled-select-wrap">
+                <i data-lucide="landmark" class="select-lead-icon"></i>
+                <select id="sendDestinationBank" class="custom-input custom-bank-select">
+                  <optgroup label="⚡ Mobile Wallets & Digital Microfinance Banks">
+                    <option value="Easypaisa" selected>Easypaisa (Telenor Microfinance Bank)</option>
+                    <option value="JazzCash">JazzCash (Mobilink Microfinance Bank)</option>
+                    <option value="Raqmi Islamic Digital Bank">Raqmi Islamic Digital Bank</option>
+                    <option value="SadaPay">SadaPay (Mastercard Wallet)</option>
+                    <option value="NayaPay">NayaPay (Visa Digital Wallet)</option>
+                    <option value="TPay Internal Wallet">TPay Wallet (Instant 0-Fee)</option>
+                    <option value="U Microfinance Bank (UPaisa)">UPaisa (U Microfinance Bank)</option>
+                    <option value="Khushhali Microfinance Bank">Khushhali Microfinance Bank</option>
+                    <option value="FINCA Microfinance Bank">FINCA Microfinance Bank</option>
+                    <option value="Mobilink Microfinance Bank">Mobilink Microfinance Bank</option>
+                  </optgroup>
+                  <optgroup label="🏦 Major Commercial & Islamic Banks">
+                    <option value="Meezan Bank">Meezan Bank Limited</option>
+                    <option value="Habib Bank Limited (HBL)">Habib Bank Limited (HBL)</option>
+                    <option value="Bank Alfalah">Bank Alfalah Limited</option>
+                    <option value="United Bank Limited (UBL)">United Bank Limited (UBL)</option>
+                    <option value="MCB Bank Limited">MCB Bank Limited</option>
+                    <option value="Allied Bank Limited (ABL)">Allied Bank Limited (ABL)</option>
+                    <option value="Faysal Bank">Faysal Bank Limited</option>
+                    <option value="Standard Chartered Bank">Standard Chartered Bank Pakistan</option>
+                    <option value="Bank of Punjab (BOP)">Bank of Punjab (BOP)</option>
+                    <option value="Askari Bank">Askari Bank Limited</option>
+                    <option value="BankIslami">BankIslami Pakistan Limited</option>
+                    <option value="JS Bank">JS Bank Limited</option>
+                    <option value="Soneri Bank">Soneri Bank Limited</option>
+                    <option value="Dubai Islamic Bank">Dubai Islamic Bank (DIB)</option>
+                    <option value="Al Baraka Bank">Al Baraka Bank Pakistan</option>
+                    <option value="Bank of Khyber">Bank of Khyber</option>
+                    <option value="Sindh Bank">Sindh Bank Limited</option>
+                    <option value="Silkbank">Silkbank Limited</option>
+                    <option value="Summit Bank">Summit Bank Limited</option>
+                    <option value="Habib Metropolitan Bank">Habib Metropolitan Bank</option>
+                    <option value="National Bank of Pakistan (NBP)">National Bank of Pakistan (NBP)</option>
+                  </optgroup>
+                </select>
+                <i data-lucide="chevron-down" class="select-trail-icon"></i>
+              </div>
+            </div>
+
+            <!-- Beneficiary Full Name -->
+            <div class="form-item-wrap">
+              <label class="form-label-title" for="sendRecipientName">Beneficiary / Receiver Full Name</label>
+              <input type="text" id="sendRecipientName" class="custom-input" placeholder="e.g. TEMOOR SHAH or Tariq Mehmood" required>
+            </div>
+
+            <!-- Recipient Account -->
+            <div class="form-item-wrap">
+              <label class="form-label-title" for="sendRecipientAccount">Account / Mobile Number / IBAN</label>
+              <input type="text" id="sendRecipientAccount" class="custom-input" placeholder="e.g. 0300 1234567 or IBAN" required>
+            </div>
+
+            <!-- Purpose -->
+            <div class="form-item-wrap">
+              <label class="form-label-title" for="sendPurposeSelect">Purpose of Payment</label>
+              <select id="sendPurposeSelect" class="custom-input">
+                <option value="Family / Personal Transfer">Family / Personal Transfer</option>
+                <option value="Business / Services Payment">Business / Services Payment</option>
+                <option value="Utility / Rent Payment">Utility / Rent Payment</option>
+                <option value="Online Shopping">Online Shopping</option>
+              </select>
+            </div>
+
+            <!-- Buttons Row for Slide 2 -->
+            <div class="step-actions-row">
+              <button class="btn-step-back" id="btnStep2Back">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                <span>Back</span>
+              </button>
+              <button class="btn-submit-sky flex-1" id="btnStep2Next">
+                <span>Next: Review Details</span>
+                <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================== SLIDE 3: REVIEW & CONFIRM =================== -->
+        <div class="send-step-slide" id="sendSlide3">
+          <div class="stage-content">
+            <!-- Review Details Voucher Card -->
+            <div class="review-summary-card">
+              <div class="review-hero-amount">
+                <span class="review-amount-label">You Are Transferring</span>
+                <div class="review-amount-val" id="reviewDispAmount">₨ 0.00</div>
+                <div class="review-free-badge">
+                  <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i>
+                  <span>Zero Fee • Instant 24/7 Raast</span>
+                </div>
+              </div>
+
+              <div class="review-details-list">
+                <div class="review-detail-item">
+                  <span class="review-detail-label">From Account</span>
+                  <div class="review-detail-value">
+                    <div>Hassan Khan</div>
+                    <small style="color: var(--text-muted); font-size: 11px;">TPay Virtual • *2009</small>
+                  </div>
+                </div>
+
+                <div class="review-detail-item">
+                  <span class="review-detail-label">Recipient Name</span>
+                  <span class="review-detail-value" id="reviewDispRecipient">-</span>
+                </div>
+
+                <div class="review-detail-item">
+                  <span class="review-detail-label">Account / Mobile</span>
+                  <span class="review-detail-value font-mono" id="reviewDispAccount">-</span>
+                </div>
+
+                <div class="review-detail-item">
+                  <span class="review-detail-label">Destination Bank</span>
+                  <span class="review-detail-value" id="reviewDispBank">-</span>
+                </div>
+
+                <div class="review-detail-item">
+                  <span class="review-detail-label">Payment Purpose</span>
+                  <span class="review-detail-value" id="reviewDispPurpose">-</span>
+                </div>
+
+                <div class="review-detail-item">
+                  <span class="review-detail-label">Transfer Fee</span>
+                  <span class="review-detail-value text-success">FREE (₨ 0.00)</span>
+                </div>
+
+                <div class="review-detail-item total-row">
+                  <span class="review-detail-label">Total Debit</span>
+                  <span class="review-detail-value total-val" id="reviewDispTotal">₨ 0.00</span>
+                </div>
+              </div>
+
+              <div class="review-security-notice">
+                <i data-lucide="shield-check" style="width: 16px; height: 16px; color: #0284C7;"></i>
+                <span>Protected by State Bank of Pakistan Raast Instant Rail</span>
+              </div>
+            </div>
+
+            <!-- Buttons for Slide 3 -->
+            <button class="btn-submit-sky btn-confirm-send" id="btnExecuteSend">
+              <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+              <span>Send Payment Now</span>
+            </button>
+
+            <button class="btn-review-back" id="btnStep3Back">
+              <i data-lucide="edit-2" style="width: 15px; height: 15px;"></i>
+              <span>Edit Details</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
-    <!-- Quick Beneficiaries -->
-    <div class="form-item-wrap">
-      <label class="form-label-title">Quick Beneficiaries</label>
-      <div class="chips-row-wrap" id="contactsRow">
-        <span class="quick-chip" data-name="TEMOOR SHAH" data-iban="0300-8822054" data-bank="Easypaisa">TEMOOR SHAH</span>
-        <span class="quick-chip" data-name="Ahmed Raza" data-iban="0312-9988441" data-bank="JazzCash">Ahmed Raza</span>
-        <span class="quick-chip" data-name="Fatima Noor" data-iban="PK92 MEZN 0021 4455" data-bank="Meezan Bank">Fatima Noor</span>
-      </div>
-    </div>
-    <!-- Beneficiary / Receiver Full Name -->
-    <div class="form-item-wrap">
-      <label class="form-label-title" for="sendRecipientName">Beneficiary / Receiver Full Name</label>
-      <input type="text" id="sendRecipientName" class="custom-input" placeholder="e.g. TEMOOR SHAH or Tariq Mehmood" required>
-    </div>
-    <!-- Recipient Account -->
-    <div class="form-item-wrap">
-      <label class="form-label-title" for="sendRecipientAccount">Account / Mobile Number / IBAN</label>
-      <input type="text" id="sendRecipientAccount" class="custom-input" placeholder="e.g. 0300 1234567 or IBAN" required>
-    </div>
-    <!-- Amount -->
-    <div class="form-item-wrap">
-      <label class="form-label-title" for="sendAmountField">Transfer Amount (PKR)</label>
-      <input type="number" id="sendAmountField" class="custom-input" placeholder="0.00" min="10">
-      <div class="chips-row-wrap">
-        <span class="quick-chip" data-amt="260">₨ 260</span>
-        <span class="quick-chip" data-amt="1000">₨ 1,000</span>
-        <span class="quick-chip" data-amt="5000">₨ 5,000</span>
-        <span class="quick-chip" data-amt="25000">₨ 25,000</span>
-        <span class="quick-chip" data-amt="50000">₨ 50,000</span>
-      </div>
-    </div>
-    <!-- Purpose -->
-    <div class="form-item-wrap">
-      <label class="form-label-title" for="sendPurposeSelect">Purpose of Payment</label>
-      <select id="sendPurposeSelect" class="custom-input">
-        <option value="Family / Personal Transfer">Family / Personal Transfer</option>
-        <option value="Business / Services Payment">Business / Services Payment</option>
-        <option value="Utility / Rent Payment">Utility / Rent Payment</option>
-        <option value="Online Shopping">Online Shopping</option>
-      </select>
-    </div>
-    <button class="btn-submit-sky" id="btnExecuteSend"><span>Proceed &amp; Send</span><i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i></button>
-  </div>
-</section>
+  </section>
 
   <!-- ============================================================== -->
   <!-- 4. STAGE FOUR: 100% MOBILE FULLSCREEN TRANSACTION RECEIPT     -->
