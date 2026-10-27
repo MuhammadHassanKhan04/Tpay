@@ -195,7 +195,8 @@ class TPayPortal {
     this.receiptDispChannel = document.getElementById("receiptDispChannel");
     this.receiptDispSender = document.getElementById("receiptDispSender");
     this.receiptDestIcon = document.getElementById("receiptDestIcon");
-    this.btnPrintReceipt = document.getElementById("btnPrintReceipt");
+    this.btnDownloadReceipt = document.getElementById("btnDownloadReceipt");
+    this.btnShareReceipt = document.getElementById("btnShareReceipt");
     this.btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
 
     // Top Push Notification
@@ -457,26 +458,19 @@ class TPayPortal {
       });
     }
 
-    // Print / Share Receipt
-    if (this.btnPrintReceipt) {
-      this.btnPrintReceipt.addEventListener("click", () => {
+    // Download Receipt Image Action
+    if (this.btnDownloadReceipt) {
+      this.btnDownloadReceipt.addEventListener("click", () => {
         this.unlockAudio();
-        const amt = this.receiptDispAmount ? this.receiptDispAmount.textContent : "Rs. 260";
-        const toName = this.receiptDispRecipient ? this.receiptDispRecipient.textContent : "Beneficiary";
-        const toAcct = this.receiptDispAccount ? this.receiptDispAccount.textContent : "";
-        const ref = this.receiptDispRef ? this.receiptDispRef.textContent : "";
-        const time = this.receiptDispTime ? this.receiptDispTime.textContent : "";
+        this.downloadReceipt();
+      });
+    }
 
-        if (navigator.share) {
-          navigator.share({
-            title: "TPay Raast Payment Receipt",
-            text: `✅ Payment of ${amt} successfully sent to ${toName} (${toAcct}) via Raast Instant.\nTransaction ID: ${ref}\n${time}\nProcessed Securely By Raqami Islamic Digital Bank.`
-          }).catch(() => {
-            window.print();
-          });
-        } else {
-          window.print();
-        }
+    // Share / Copy Receipt Action
+    if (this.btnShareReceipt) {
+      this.btnShareReceipt.addEventListener("click", () => {
+        this.unlockAudio();
+        this.shareReceipt();
       });
     }
 
@@ -1056,6 +1050,386 @@ class TPayPortal {
 
     if (window.lucide) {
       lucide.createIcons();
+    }
+  }
+
+  // --- Download Receipt Image ---
+  async downloadReceipt() {
+    const voucher = document.getElementById("officialVoucher");
+    const ref = (this.receiptDispRef && this.receiptDispRef.textContent.trim()) || "TPay";
+    const filename = `TPay_Receipt_${ref}.png`;
+
+    const originalBtnHtml = this.btnDownloadReceipt ? this.btnDownloadReceipt.innerHTML : "";
+    if (this.btnDownloadReceipt) {
+      this.btnDownloadReceipt.disabled = true;
+      this.btnDownloadReceipt.innerHTML = `
+        <svg class="spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        <span>Saving...</span>
+      `;
+    }
+
+    this.notify("Preparing receipt download...");
+
+    let success = false;
+
+    // Attempt html2canvas first if loaded
+    if (window.html2canvas && voucher) {
+      try {
+        const canvas = await window.html2canvas(voucher, {
+          scale: 3, // Ultra-sharp 3x resolution
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#FFFFFF",
+          logging: false,
+          onclone: (clonedDoc) => {
+            const clonedVoucher = clonedDoc.getElementById("officialVoucher");
+            if (clonedVoucher) {
+              clonedVoucher.style.transform = "none";
+              clonedVoucher.style.boxShadow = "none";
+            }
+          }
+        });
+
+        if (canvas && canvas.width > 0 && canvas.height > 0) {
+          this.triggerCanvasDownload(canvas, filename);
+          this.notify("✅ Receipt downloaded!");
+          success = true;
+        }
+      } catch (err) {
+        console.warn("html2canvas render error, using Canvas 2D fallback:", err);
+      }
+    }
+
+    // Fallback: Offline pure Canvas 2D engine
+    if (!success) {
+      try {
+        const fallbackCanvas = this.renderFallbackReceiptCanvas();
+        this.triggerCanvasDownload(fallbackCanvas, filename);
+        this.notify("✅ Receipt saved successfully!");
+        success = true;
+      } catch (fallbackErr) {
+        console.error("Canvas 2D fallback error:", fallbackErr);
+        window.print();
+        this.notify("Print dialog opened");
+      }
+    }
+
+    this.resetDownloadBtn(originalBtnHtml);
+  }
+
+  resetDownloadBtn(originalHtml) {
+    if (this.btnDownloadReceipt) {
+      this.btnDownloadReceipt.disabled = false;
+      this.btnDownloadReceipt.innerHTML = originalHtml;
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+  }
+
+  triggerCanvasDownload(canvas, filename) {
+    if (canvas.toBlob) {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          this.downloadViaDataUrl(canvas, filename);
+          return;
+        }
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        }, 300);
+      }, "image/png");
+    } else {
+      this.downloadViaDataUrl(canvas, filename);
+    }
+  }
+
+  downloadViaDataUrl(canvas, filename) {
+    const dataUrl = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+    }, 300);
+  }
+
+  // --- Pure HTML5 Canvas 2D Fallback Receipt Generator ---
+  renderFallbackReceiptCanvas() {
+    const width = 420;
+    const height = 580;
+    const scale = 2;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+
+    const drawRoundedRect = (c, x, y, w, h, r) => {
+      if (c.roundRect) {
+        c.beginPath();
+        c.roundRect(x, y, w, h, r);
+      } else {
+        c.beginPath();
+        c.moveTo(x + r, y);
+        c.lineTo(x + w - r, y);
+        c.quadraticCurveTo(x + w, y, x + w, y + r);
+        c.lineTo(x + w, y + h - r);
+        c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        c.lineTo(x + r, y + h);
+        c.quadraticCurveTo(x, y + h, x, y + h - r);
+        c.lineTo(x, y + r);
+        c.quadraticCurveTo(x, y, x + r, y);
+        c.closePath();
+      }
+    };
+
+    // Background
+    ctx.fillStyle = "#F8FAFC";
+    ctx.fillRect(0, 0, width, height);
+
+    // Voucher Card
+    const cardX = 20;
+    const cardY = 16;
+    const cardW = width - 40;
+    const cardH = height - 32;
+    const r = 24;
+
+    ctx.save();
+    ctx.fillStyle = "#FFFFFF";
+    ctx.strokeStyle = "#E2E8F0";
+    ctx.lineWidth = 1.5;
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, r);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // Halo & Checkmark Circle
+    const cx = width / 2;
+    const cy = cardY + 54;
+
+    // Halo outer circle
+    ctx.fillStyle = "rgba(99, 85, 216, 0.12)";
+    ctx.beginPath();
+    ctx.arc(cx, cy, 26, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner solid circle
+    ctx.fillStyle = "#6355D8";
+    ctx.beginPath();
+    ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+    ctx.fill();
+
+    // White checkmark
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(cx - 7, cy);
+    ctx.lineTo(cx - 2, cy + 5);
+    ctx.lineTo(cx + 8, cy - 5);
+    ctx.stroke();
+
+    // Amount
+    const amtText = (this.receiptDispAmount && this.receiptDispAmount.textContent.trim()) || "Rs. 260";
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "800 32px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(amtText, cx, cardY + 116);
+
+    // Timestamp
+    const timeText = (this.receiptDispTime && this.receiptDispTime.textContent.trim()) || "Sent just now";
+    ctx.fillStyle = "#64748B";
+    ctx.font = "600 12.5px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+    ctx.fillText(timeText, cx, cardY + 138);
+
+    // Perforation Divider with Notches & Dots
+    const notchY = cardY + 172;
+
+    // Notches (cutouts on card edges)
+    ctx.fillStyle = "#F8FAFC";
+    ctx.beginPath();
+    ctx.arc(cardX, notchY, 11, -Math.PI / 2, Math.PI / 2, false);
+    ctx.fill();
+    ctx.strokeStyle = "#E2E8F0";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cardX, notchY, 11, -Math.PI / 2, Math.PI / 2, false);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cardX + cardW, notchY, 11, Math.PI / 2, -Math.PI / 2, false);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cardX + cardW, notchY, 11, Math.PI / 2, -Math.PI / 2, false);
+    ctx.stroke();
+
+    // Dotted line across notches
+    ctx.fillStyle = "#111827";
+    const dotStartX = cardX + 22;
+    const dotEndX = cardX + cardW - 22;
+    const numDots = 20;
+    const step = (dotEndX - dotStartX) / (numDots - 1);
+    for (let i = 0; i < numDots; i++) {
+      ctx.beginPath();
+      ctx.arc(dotStartX + i * step, notchY, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Two Column Boxes (From & To)
+    const boxY = notchY + 22;
+    const boxW = (cardW - 44) / 2;
+    const boxH = 68;
+
+    // From Box
+    const fromX = cardX + 16;
+    ctx.fillStyle = "#F8FAFC";
+    ctx.strokeStyle = "#E2E8F0";
+    ctx.lineWidth = 1;
+    drawRoundedRect(ctx, fromX, boxY, boxW, boxH, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    // From Label
+    ctx.fillStyle = "#64748B";
+    ctx.font = "700 11px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("From", fromX + 10, boxY + 18);
+
+    // From Name & Account
+    const senderName = (this.receiptDispSender && this.receiptDispSender.textContent.trim()) || "Sufiyan Ali";
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "800 12.5px system-ui, sans-serif";
+    ctx.fillText(senderName, fromX + 10, boxY + 38);
+    ctx.fillStyle = "#475569";
+    ctx.font = "600 11px system-ui, sans-serif";
+    ctx.fillText("*2009", fromX + 10, boxY + 54);
+
+    // To Box
+    const toX = fromX + boxW + 12;
+    ctx.fillStyle = "#F8FAFC";
+    ctx.strokeStyle = "#E2E8F0";
+    ctx.lineWidth = 1;
+    drawRoundedRect(ctx, toX, boxY, boxW, boxH, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    // To Label
+    ctx.fillStyle = "#64748B";
+    ctx.font = "700 11px system-ui, sans-serif";
+    ctx.fillText("To", toX + 10, boxY + 18);
+
+    // To Name & Account
+    const toName = (this.receiptDispRecipient && this.receiptDispRecipient.textContent.trim()) || "Beneficiary";
+    const toAcct = (this.receiptDispAccount && this.receiptDispAccount.textContent.trim()) || "*0000";
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "800 12.5px system-ui, sans-serif";
+    const truncatedTo = toName.length > 15 ? toName.slice(0, 14) + "…" : toName;
+    ctx.fillText(truncatedTo, toX + 10, boxY + 38);
+    ctx.fillStyle = "#475569";
+    ctx.font = "600 11px system-ui, sans-serif";
+    ctx.fillText(toAcct, toX + 10, boxY + 54);
+
+    // Details Rows
+    const detailsY = boxY + boxH + 26;
+    const refVal = (this.receiptDispRef && this.receiptDispRef.textContent.trim()) || "488274323";
+    const chanVal = (this.receiptDispChannel && this.receiptDispChannel.textContent.trim()) || "Raast";
+
+    // Row 1: Transaction ID
+    ctx.fillStyle = "#64748B";
+    ctx.font = "600 12px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Transaction ID", cardX + 20, detailsY);
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "700 12px system-ui, sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(refVal, cardX + cardW - 20, detailsY);
+
+    // Row 2: Transaction Channel
+    ctx.fillStyle = "#64748B";
+    ctx.font = "600 12px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Transaction Channel", cardX + 20, detailsY + 26);
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "700 12px system-ui, sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(chanVal, cardX + cardW - 20, detailsY + 26);
+
+    // Bottom Divider
+    const footY = detailsY + 54;
+    ctx.strokeStyle = "#E2E8F0";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cardX + 20, footY);
+    ctx.lineTo(cardX + cardW - 20, footY);
+    ctx.stroke();
+
+    // Footer: Processed Securely By | RAQAMI ISLAMIC DIGITAL BANK
+    ctx.fillStyle = "#64748B";
+    ctx.font = "700 9px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("PROCESSED", cardX + 22, footY + 22);
+    ctx.fillText("SECURELY BY", cardX + 22, footY + 34);
+
+    // Divider
+    ctx.strokeStyle = "#CBD5E1";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cardX + 96, footY + 12);
+    ctx.lineTo(cardX + 96, footY + 44);
+    ctx.stroke();
+
+    // RAQAMI Brand Text
+    ctx.fillStyle = "#1E293B";
+    ctx.font = "900 13px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("RAQAMI", cardX + 108, footY + 24);
+
+    ctx.fillStyle = "#00A389";
+    ctx.font = "800 7.5px system-ui, sans-serif";
+    ctx.fillText("ISLAMIC DIGITAL BANK", cardX + 108, footY + 38);
+
+    return canvas;
+  }
+
+  // --- Share / Copy Receipt ---
+  shareReceipt() {
+    const amt = this.receiptDispAmount ? this.receiptDispAmount.textContent : "Rs. 260";
+    const toName = this.receiptDispRecipient ? this.receiptDispRecipient.textContent : "Beneficiary";
+    const toAcct = this.receiptDispAccount ? this.receiptDispAccount.textContent : "";
+    const ref = this.receiptDispRef ? this.receiptDispRef.textContent : "";
+    const time = this.receiptDispTime ? this.receiptDispTime.textContent : "";
+    const sender = this.receiptDispSender ? this.receiptDispSender.textContent : "Sufiyan Ali";
+
+    const shareData = {
+      title: "TPay Raast Payment Receipt",
+      text: `✅ Payment of ${amt} successfully sent to ${toName} (${toAcct}) via Raast Instant.\nSender: ${sender}\nTransaction ID: ${ref}\n${time}\nProcessed Securely By Raqami Islamic Digital Bank.`
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData).catch((err) => {
+        if (err.name !== 'AbortError') {
+          this.downloadReceipt();
+        }
+      });
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareData.text).then(() => {
+        this.notify("Receipt details copied to clipboard!");
+      }).catch(() => {
+        window.print();
+      });
+    } else {
+      window.print();
     }
   }
 

@@ -1315,23 +1315,22 @@ body {
   display: flex;
   gap: 10px;
   margin-top: 16px;
-  max-width: 390px;
+  max-width: 420px;
   margin-left: auto;
   margin-right: auto;
   width: 100%;
 }
 
 .btn-ticket-done {
-  flex: 1.2;
-  padding: 15px;
-  background: #5C4EBA;
-  color: #FFFFFF;
-  font-weight: 800;
-  font-size: 15px;
-  border: none;
-  border-radius: 16px;
+  flex: 1;
+  padding: 13px 10px;
+  background: #F1F5F9;
+  color: #334155;
+  font-weight: 700;
+  font-size: 13.5px;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(92, 78, 186, 0.35);
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -1340,40 +1339,72 @@ body {
 }
 
 .btn-ticket-done:hover, .btn-ticket-done:active {
-  background: #493CA8;
+  background: #E2E8F0;
+  color: #0F172A;
   transform: translateY(-1px);
+}
+
+.btn-ticket-download {
+  flex: 1.35;
+  padding: 13px 12px;
+  background: linear-gradient(135deg, #6355D8 0%, #4B3CA8 100%);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 14px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(99, 85, 216, 0.38);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-ticket-download:hover, .btn-ticket-download:active {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(99, 85, 216, 0.5);
+  filter: brightness(1.06);
+}
+
+.btn-ticket-download:disabled {
+  opacity: 0.8;
+  cursor: wait;
+}
+
+@keyframes tpaySpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin-icon {
+  animation: tpaySpin 0.8s linear infinite;
+  display: inline-block;
 }
 
 .btn-ticket-share {
   flex: 1;
-  padding: 15px;
+  padding: 13px 10px;
   background: #FFFFFF;
   color: #0F172A;
   font-weight: 700;
-  font-size: 14px;
-  border: 1.5px solid #E2E8F0;
-  border-radius: 16px;
+  font-size: 13.5px;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   transition: all 0.2s;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .btn-ticket-share:hover, .btn-ticket-share:active {
   background: #F8FAFC;
-  border-color: #CBD5E1;
-}
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s;
-}
-
-.btn-ticket-share:hover, .btn-ticket-share:active {
-  background: #F1F5F9;
+  border-color: #94A3B8;
+  transform: translateY(-1px);
 }
 
 /* Print Specific Rules */
@@ -2404,7 +2435,37 @@ body {
 
 #receiptScreen .ticket-actions-bar {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  #receiptScreen .ticket-actions-bar {
+    gap: 8px;
+  }
+  #receiptScreen .btn-ticket-done,
+  #receiptScreen .btn-ticket-download,
+  #receiptScreen .btn-ticket-share {
+    padding: 12px 8px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+  #receiptScreen .btn-ticket-download {
+    font-size: 13px;
+    font-weight: 800;
+  }
+}
+
+@media (max-width: 360px) {
+  #receiptScreen .ticket-actions-bar {
+    gap: 6px;
+  }
+  #receiptScreen .btn-ticket-done,
+  #receiptScreen .btn-ticket-download,
+  #receiptScreen .btn-ticket-share {
+    padding: 11px 4px;
+    font-size: 12px;
+    gap: 4px;
+  }
 }
