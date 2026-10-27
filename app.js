@@ -2,7 +2,7 @@
  * TPay - Modern White & Sky Blue Fintech Portal
  * Strict Sequential Flow:
  * Phase 1: Pure Fullscreen Splash -> Phase 2: Fullscreen Password (2009) -> Phase 3: Dashboard & Account
- * User: Hassan Khan | PIN: 2009 | Balance: 500k
+ * User: Sufiyan Ali | PIN: 2009 | Balance: 500k
  */
 
 const DEFAULT_BALANCE = 500000.00;
@@ -67,19 +67,19 @@ class TPayPortal {
 
   // --- Persistence & 24h Auto-Refill ---
   loadBalance() {
-    const saved = localStorage.getItem("tpay_hassan_balance");
+    const saved = localStorage.getItem("tpay_sufiyan_balance") || localStorage.getItem("tpay_hassan_balance");
     return saved !== null ? parseFloat(saved) : DEFAULT_BALANCE;
   }
 
   saveBalance(amt) {
     this.balance = amt;
-    localStorage.setItem("tpay_hassan_balance", amt.toString());
-    localStorage.setItem("tpay_hassan_last_cycle", Date.now().toString());
+    localStorage.setItem("tpay_sufiyan_balance", amt.toString());
+    localStorage.setItem("tpay_sufiyan_last_cycle", Date.now().toString());
     this.updateBalanceDisplay();
   }
 
   check24hAutoReplenish() {
-    const lastCycle = localStorage.getItem("tpay_hassan_last_cycle");
+    const lastCycle = localStorage.getItem("tpay_sufiyan_last_cycle") || localStorage.getItem("tpay_hassan_last_cycle");
     const now = Date.now();
     const oneDay = 24 * 60 * 60 * 1000;
 
@@ -89,12 +89,12 @@ class TPayPortal {
   }
 
   loadTransactions() {
-    const saved = localStorage.getItem("tpay_hassan_txs");
+    const saved = localStorage.getItem("tpay_sufiyan_txs") || localStorage.getItem("tpay_hassan_txs");
     return saved ? JSON.parse(saved) : [...INITIAL_TRANSACTIONS];
   }
 
   saveTransactions() {
-    localStorage.setItem("tpay_hassan_txs", JSON.stringify(this.transactions));
+    localStorage.setItem("tpay_sufiyan_txs", JSON.stringify(this.transactions));
     this.renderTransactions();
   }
 
@@ -193,6 +193,8 @@ class TPayPortal {
     this.receiptDispAccount = document.getElementById("receiptDispAccount");
     this.receiptDispRef = document.getElementById("receiptDispRef");
     this.receiptDispChannel = document.getElementById("receiptDispChannel");
+    this.receiptDispSender = document.getElementById("receiptDispSender");
+    this.receiptDestIcon = document.getElementById("receiptDestIcon");
     this.btnPrintReceipt = document.getElementById("btnPrintReceipt");
     this.btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
 
@@ -215,7 +217,7 @@ class TPayPortal {
     // Profile & Notifications
     if (this.btnUserProfile) {
       this.btnUserProfile.addEventListener("click", () => {
-        this.notify("Hassan Khan • Account PK92 TPAY 8822 2009");
+        this.notify("Sufiyan Ali • Account PK92 TPAY 8822 2009");
       });
     }
 
@@ -278,7 +280,7 @@ class TPayPortal {
 
     if (this.btnTriggerRequest) {
       this.btnTriggerRequest.addEventListener("click", () => {
-        this.notify("Payment link generated: tpay.me/hassan_khan");
+        this.notify("Payment link generated: tpay.me/sufiyan_ali");
       });
     }
 
@@ -455,10 +457,26 @@ class TPayPortal {
       });
     }
 
-    // Print / Save Receipt
+    // Print / Share Receipt
     if (this.btnPrintReceipt) {
       this.btnPrintReceipt.addEventListener("click", () => {
-        window.print();
+        this.unlockAudio();
+        const amt = this.receiptDispAmount ? this.receiptDispAmount.textContent : "Rs. 260";
+        const toName = this.receiptDispRecipient ? this.receiptDispRecipient.textContent : "Beneficiary";
+        const toAcct = this.receiptDispAccount ? this.receiptDispAccount.textContent : "";
+        const ref = this.receiptDispRef ? this.receiptDispRef.textContent : "";
+        const time = this.receiptDispTime ? this.receiptDispTime.textContent : "";
+
+        if (navigator.share) {
+          navigator.share({
+            title: "TPay Raast Payment Receipt",
+            text: `✅ Payment of ${amt} successfully sent to ${toName} (${toAcct}) via Raast Instant.\nTransaction ID: ${ref}\n${time}\nProcessed Securely By Raqami Islamic Digital Bank.`
+          }).catch(() => {
+            window.print();
+          });
+        } else {
+          window.print();
+        }
       });
     }
 
@@ -656,7 +674,7 @@ class TPayPortal {
       this.showScreen("dashboardScreen");
       this.enteredPin = "";
       this.updatePinDots();
-      this.notify("Welcome back, Hassan Khan");
+      this.notify("Welcome back, Sufiyan Ali");
     }, 250);
   }
 
@@ -965,6 +983,61 @@ class TPayPortal {
     }
   }
 
+  // --- Bank / Wallet SVG Emblem Generator ---
+  getBankIconHtml(bankName) {
+    const bank = (bankName || "").toLowerCase();
+    if (bank.includes("easypaisa")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#00A651"/>
+        <path d="M14 6C9.6 6 6 9.6 6 14C6 18.4 9.6 22 14 22C17.5 22 20.5 19.7 21.5 16.5H16.8C16.1 17.6 15.1 18.3 14 18.3C11.6 18.3 9.7 16.4 9.7 14C9.7 11.6 11.6 9.7 14 9.7C15.6 9.7 17 10.6 17.7 11.9H21.8C20.8 8.5 17.7 6 14 6Z" fill="#FFFFFF"/>
+        <circle cx="14" cy="14" r="2.8" fill="#0F172A"/>
+      </svg>`;
+    } else if (bank.includes("jazzcash") || bank.includes("mobilink")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#ED1C24"/>
+        <path d="M16 8H12V17C12 18.7 10.7 20 9 20C7.3 20 6 18.7 6 17H8.5C8.5 17.3 8.7 17.5 9 17.5C9.3 17.5 9.5 17.3 9.5 17V8H8V5.5H16V8Z" fill="#FFFFFF"/>
+        <circle cx="19" cy="9" r="2.2" fill="#FFC800"/>
+      </svg>`;
+    } else if (bank.includes("sada")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#14B8A6"/>
+        <circle cx="11.5" cy="14" r="5" fill="#FFFFFF" fill-opacity="0.85"/>
+        <circle cx="16.5" cy="14" r="5" fill="#FF7043" fill-opacity="0.9"/>
+      </svg>`;
+    } else if (bank.includes("naya")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#F97316"/>
+        <path d="M9 8H11.5L16.5 16.5V8H19V20H16.5L11.5 11.5V20H9V8Z" fill="#FFFFFF"/>
+      </svg>`;
+    } else if (bank.includes("raqmi") || bank.includes("raqami")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#EDE9FE"/>
+        <rect x="7" y="7" width="14" height="14" rx="1" transform="rotate(0 14 14)" stroke="#6366F1" stroke-width="1.6"/>
+        <rect x="7" y="7" width="14" height="14" rx="1" transform="rotate(45 14 14)" stroke="#6366F1" stroke-width="1.6"/>
+        <circle cx="14" cy="14" r="2" fill="#6366F1"/>
+      </svg>`;
+    } else if (bank.includes("meezan")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#1E3A8A"/>
+        <path d="M14 6L21 11V13H7V11L14 6ZM9 14H11V19H9V14ZM13 14H15V19H13V14ZM17 14H19V19H17V14ZM7 20H21V22H7V20Z" fill="#FFFFFF"/>
+      </svg>`;
+    } else if (bank.includes("habib") || bank.includes("hbl")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#047857"/>
+        <path d="M14 6L21 11V13H7V11L14 6ZM9 14H11V19H9V14ZM13 14H15V19H13V14ZM17 14H19V19H17V14ZM7 20H21V22H7V20Z" fill="#FFFFFF"/>
+      </svg>`;
+    } else if (bank.includes("alfalah")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#DC2626"/>
+        <path d="M14 6L21 11V13H7V11L14 6ZM9 14H11V19H9V14ZM13 14H15V19H13V14ZM17 14H19V19H17V14ZM7 20H21V22H7V20Z" fill="#FFFFFF"/>
+      </svg>`;
+    }
+    return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="14" r="13" fill="#0284C7"/>
+      <path d="M14 6L21 11V13H7V11L14 6ZM9 14H11V19H9V14ZM13 14H15V19H13V14ZM17 14H19V19H17V14ZM7 20H21V22H7V20Z" fill="#FFFFFF"/>
+    </svg>`;
+  }
+
   // --- Show Exact Ticket Receipt ---
   showReceiptModal(data) {
     if (this.receiptDispAmount) this.receiptDispAmount.textContent = data.amountStr;
@@ -973,6 +1046,10 @@ class TPayPortal {
     if (this.receiptDispAccount) this.receiptDispAccount.textContent = data.accountMask;
     if (this.receiptDispRef) this.receiptDispRef.textContent = data.ref;
     if (this.receiptDispChannel) this.receiptDispChannel.textContent = data.channel;
+    if (this.receiptDispSender) this.receiptDispSender.textContent = "Sufiyan Ali";
+    if (this.receiptDestIcon) {
+      this.receiptDestIcon.innerHTML = this.getBankIconHtml(data.bank);
+    }
 
     // Switch stage screen directly so it is 100% visible and centered on mobile
     this.showScreen("receiptScreen");
