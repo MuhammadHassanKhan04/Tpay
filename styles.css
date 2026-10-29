@@ -1323,19 +1323,19 @@ body {
 
 .btn-ticket-done {
   flex: 1;
-  padding: 13px 10px;
+  padding: 14px 16px;
   background: #F1F5F9;
   color: #334155;
   font-weight: 700;
-  font-size: 13.5px;
-  border: 1px solid #E2E8F0;
-  border-radius: 14px;
+  font-size: 14px;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .btn-ticket-done:hover, .btn-ticket-done:active {
@@ -1344,67 +1344,28 @@ body {
   transform: translateY(-1px);
 }
 
-.btn-ticket-download {
+.btn-ticket-share {
   flex: 1.35;
-  padding: 13px 12px;
+  padding: 14px 18px;
   background: linear-gradient(135deg, #6355D8 0%, #4B3CA8 100%);
   color: #FFFFFF;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 14.5px;
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(99, 85, 216, 0.38);
-  transition: all 0.2s;
+  box-shadow: 0 8px 24px rgba(99, 85, 216, 0.38);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-}
-
-.btn-ticket-download:hover, .btn-ticket-download:active {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 22px rgba(99, 85, 216, 0.5);
-  filter: brightness(1.06);
-}
-
-.btn-ticket-download:disabled {
-  opacity: 0.8;
-  cursor: wait;
-}
-
-@keyframes tpaySpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.spin-icon {
-  animation: tpaySpin 0.8s linear infinite;
-  display: inline-block;
-}
-
-.btn-ticket-share {
-  flex: 1;
-  padding: 13px 10px;
-  background: #FFFFFF;
-  color: #0F172A;
-  font-weight: 700;
-  font-size: 13.5px;
-  border: 1.5px solid #CBD5E1;
-  border-radius: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 8px;
 }
 
 .btn-ticket-share:hover, .btn-ticket-share:active {
-  background: #F8FAFC;
-  border-color: #94A3B8;
   transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(99, 85, 216, 0.48);
+  filter: brightness(1.06);
 }
 
 /* Print Specific Rules */
@@ -1742,6 +1703,45 @@ body {
 
 .btn-edit-amount-pill:hover {
   background: #BAE6FD;
+}
+
+/* Step 3: Bank & Amount Summary Reminder */
+.selected-summary-reminder {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.summary-reminder-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.reminder-bank-pill {
+  background: #EFF6FF;
+  color: #0284C7;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #BAE6FD;
+}
+
+.reminder-amt-pill {
+  background: #ECFDF5;
+  color: #059669;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #A7F3D0;
 }
 
 /* Step 2 & 3: Actions row */
@@ -2275,6 +2275,8 @@ body {
 .mz-dot { background: #1E3A8A; }
 .hbl-dot { background: #047857; }
 .ba-dot { background: #DC2626; }
+.pv-dot { background: #6366F1; box-shadow: 0 0 6px rgba(99, 102, 241, 0.6); }
+.ubl-dot { background: #0284C7; }
 
 .quick-chip {
   display: inline-flex;
@@ -2418,9 +2420,22 @@ body {
   box-sizing: border-box;
 }
 
+@keyframes voucherPopSmooth {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 #receiptScreen .ticket-receipt-card {
-  box-shadow: 0 18px 48px rgba(92, 78, 186, 0.14), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
-  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  animation: voucherPopSmooth 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: 0 20px 48px -10px rgba(99, 85, 216, 0.18), 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 28px !important;
   margin: 0 auto;
   width: 100%;
 }
@@ -2435,37 +2450,56 @@ body {
 
 #receiptScreen .ticket-actions-bar {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 @media (max-width: 480px) {
+  .send-stepper-bar {
+    max-width: 100%;
+  }
+  .step-connector-line {
+    margin: 0 4px 14px;
+  }
+  .step-num-circle {
+    width: 25px;
+    height: 25px;
+    font-size: 11px;
+  }
+  .step-num-text {
+    font-size: 10px;
+  }
   #receiptScreen .ticket-actions-bar {
-    gap: 8px;
+    gap: 10px;
   }
   #receiptScreen .btn-ticket-done,
-  #receiptScreen .btn-ticket-download,
   #receiptScreen .btn-ticket-share {
-    padding: 12px 8px;
-    font-size: 13px;
-    border-radius: 12px;
-  }
-  #receiptScreen .btn-ticket-download {
-    font-size: 13px;
-    font-weight: 800;
+    padding: 13px 12px;
+    font-size: 13.5px;
+    border-radius: 14px;
   }
 }
 
 @media (max-width: 360px) {
+  .step-connector-line {
+    margin: 0 2px 14px;
+  }
+  .step-num-circle {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+  .step-num-text {
+    font-size: 9px;
+  }
   #receiptScreen .ticket-actions-bar {
-    gap: 6px;
+    gap: 8px;
   }
   #receiptScreen .btn-ticket-done,
-  #receiptScreen .btn-ticket-download,
   #receiptScreen .btn-ticket-share {
-    padding: 11px 4px;
-    font-size: 12px;
-    gap: 4px;
+    padding: 12px 8px;
+    font-size: 12.5px;
+    border-radius: 12px;
   }
 }

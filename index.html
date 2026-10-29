@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="styles.css">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- HTML2Canvas for Direct Receipt Image Download -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -228,7 +226,7 @@
       <h2 class="stage-title" id="sendStageTitle">Send Money</h2>
     </div>
 
-    <!-- 3-Step Visual Progress Stepper -->
+    <!-- 4-Step Visual Progress Stepper -->
     <div class="send-stepper-wrap">
       <div class="send-stepper-bar">
         <div class="step-indicator-item active" id="stepIndicator1">
@@ -238,11 +236,16 @@
         <div class="step-connector-line" id="stepConnector1"></div>
         <div class="step-indicator-item" id="stepIndicator2">
           <div class="step-num-circle">2</div>
-          <span class="step-num-text">Recipient</span>
+          <span class="step-num-text">Bank</span>
         </div>
         <div class="step-connector-line" id="stepConnector2"></div>
         <div class="step-indicator-item" id="stepIndicator3">
           <div class="step-num-circle">3</div>
+          <span class="step-num-text">Details</span>
+        </div>
+        <div class="step-connector-line" id="stepConnector3"></div>
+        <div class="step-indicator-item" id="stepIndicator4">
+          <div class="step-num-circle">4</div>
           <span class="step-num-text">Confirm</span>
         </div>
       </div>
@@ -293,13 +296,13 @@
 
             <!-- Next Button for Slide 1 -->
             <button class="btn-submit-sky" id="btnStep1Next">
-              <span>Next: Recipient Details</span>
+              <span>Next: Select Bank</span>
               <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
             </button>
           </div>
         </div>
 
-        <!-- =================== SLIDE 2: RECIPIENT =================== -->
+        <!-- =================== SLIDE 2: SELECT BANK =================== -->
         <div class="send-step-slide" id="sendSlide2">
           <div class="stage-content">
             <!-- Selected Amount Reminder -->
@@ -309,17 +312,7 @@
               <button class="btn-edit-amount-pill" id="btnEditAmountFromStep2" title="Change amount">Edit</button>
             </div>
 
-            <!-- Quick Beneficiaries -->
-            <div class="form-item-wrap">
-              <label class="form-label-title">Quick Beneficiaries</label>
-              <div class="chips-row-wrap" id="contactsRow">
-                <span class="quick-chip" data-name="TEMOOR SHAH" data-iban="0300-8822054" data-bank="Easypaisa">TEMOOR SHAH</span>
-                <span class="quick-chip" data-name="Ahmed Raza" data-iban="0312-9988441" data-bank="JazzCash">Ahmed Raza</span>
-                <span class="quick-chip" data-name="Fatima Noor" data-iban="PK92 MEZN 0021 4455" data-bank="Meezan Bank">Fatima Noor</span>
-              </div>
-            </div>
-
-            <!-- Quick Bank Filter Badges -->
+            <!-- Popular Wallets & Banks Selection Grid -->
             <div class="form-item-wrap">
               <div class="form-label-row">
                 <label class="form-label-title">Popular Wallets &amp; Banks</label>
@@ -331,6 +324,9 @@
                 </span>
                 <span class="quick-chip" data-quickbank="JazzCash">
                   <span class="bank-dot jc-dot"></span>JazzCash
+                </span>
+                <span class="quick-chip" data-quickbank="PayVay (Raast)">
+                  <span class="bank-dot pv-dot"></span>PayVay (Raast)
                 </span>
                 <span class="quick-chip" data-quickbank="Raqmi Islamic Digital Bank">
                   <span class="bank-dot rq-dot"></span>Raqmi Bank
@@ -350,6 +346,9 @@
                 <span class="quick-chip" data-quickbank="Bank Alfalah">
                   <span class="bank-dot ba-dot"></span>Bank Alfalah
                 </span>
+                <span class="quick-chip" data-quickbank="United Bank Limited (UBL)">
+                  <span class="bank-dot ubl-dot"></span>UBL
+                </span>
               </div>
             </div>
 
@@ -359,9 +358,10 @@
               <div class="styled-select-wrap">
                 <i data-lucide="landmark" class="select-lead-icon"></i>
                 <select id="sendDestinationBank" class="custom-input custom-bank-select">
-                  <optgroup label="⚡ Mobile Wallets & Digital Microfinance Banks">
+                  <optgroup label="⚡ Mobile Wallets & Digital Raast Accounts">
                     <option value="Easypaisa" selected>Easypaisa (Telenor Microfinance Bank)</option>
                     <option value="JazzCash">JazzCash (Mobilink Microfinance Bank)</option>
+                    <option value="PayVay (Raast)">PayVay (Raast Digital Wallet / Account)</option>
                     <option value="Raqmi Islamic Digital Bank">Raqmi Islamic Digital Bank</option>
                     <option value="SadaPay">SadaPay (Mastercard Wallet)</option>
                     <option value="NayaPay">NayaPay (Visa Digital Wallet)</option>
@@ -399,6 +399,43 @@
               </div>
             </div>
 
+            <!-- Buttons Row for Slide 2 -->
+            <div class="step-actions-row">
+              <button class="btn-step-back" id="btnStep2Back">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                <span>Back</span>
+              </button>
+              <button class="btn-submit-sky flex-1" id="btnStep2Next">
+                <span>Next: Recipient Details</span>
+                <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================== SLIDE 3: RECIPIENT DETAILS =================== -->
+        <div class="send-step-slide" id="sendSlide3">
+          <div class="stage-content">
+            <!-- Selected Bank & Amount reminder card -->
+            <div class="selected-summary-reminder">
+              <div class="summary-reminder-left">
+                <span class="reminder-bank-pill" id="step3BankBadge">Easypaisa</span>
+                <span class="reminder-amt-pill" id="step3AmountBadge">₨ 0.00</span>
+              </div>
+              <button class="btn-edit-amount-pill" id="btnChangeBankFromStep3" title="Change Bank">Change Bank</button>
+            </div>
+
+            <!-- Quick Beneficiaries -->
+            <div class="form-item-wrap">
+              <label class="form-label-title">Quick Beneficiaries</label>
+              <div class="chips-row-wrap" id="contactsRow">
+                <span class="quick-chip" data-name="TEMOOR SHAH" data-iban="0300-8822054" data-bank="Easypaisa">TEMOOR SHAH</span>
+                <span class="quick-chip" data-name="Ahmed Raza" data-iban="0312-9988441" data-bank="JazzCash">Ahmed Raza</span>
+                <span class="quick-chip" data-name="Fatima Noor" data-iban="PK92 MEZN 0021 4455" data-bank="Meezan Bank">Fatima Noor</span>
+                <span class="quick-chip" data-name="Kashif Ali" data-iban="0333-5511229" data-bank="PayVay (Raast)">Kashif Ali</span>
+              </div>
+            </div>
+
             <!-- Beneficiary Full Name -->
             <div class="form-item-wrap">
               <label class="form-label-title" for="sendRecipientName">Beneficiary / Receiver Full Name</label>
@@ -411,7 +448,7 @@
               <input type="text" id="sendRecipientAccount" class="custom-input" placeholder="e.g. 0300 1234567 or IBAN" required>
             </div>
 
-            <!-- Purpose -->
+            <!-- Purpose of Payment -->
             <div class="form-item-wrap">
               <label class="form-label-title" for="sendPurposeSelect">Purpose of Payment</label>
               <select id="sendPurposeSelect" class="custom-input">
@@ -419,25 +456,27 @@
                 <option value="Business / Services Payment">Business / Services Payment</option>
                 <option value="Utility / Rent Payment">Utility / Rent Payment</option>
                 <option value="Online Shopping">Online Shopping</option>
+                <option value="Education / Fees">Education / Fees</option>
+                <option value="Donation / Charity">Donation / Charity</option>
               </select>
             </div>
 
-            <!-- Buttons Row for Slide 2 -->
+            <!-- Buttons Row for Slide 3 -->
             <div class="step-actions-row">
-              <button class="btn-step-back" id="btnStep2Back">
+              <button class="btn-step-back" id="btnStep3Back">
                 <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
                 <span>Back</span>
               </button>
-              <button class="btn-submit-sky flex-1" id="btnStep2Next">
-                <span>Next: Review Details</span>
+              <button class="btn-submit-sky flex-1" id="btnStep3Next">
+                <span>Next: Review &amp; Confirm</span>
                 <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- =================== SLIDE 3: REVIEW & CONFIRM =================== -->
-        <div class="send-step-slide" id="sendSlide3">
+        <!-- =================== SLIDE 4: REVIEW & CONFIRM =================== -->
+        <div class="send-step-slide" id="sendSlide4">
           <div class="stage-content">
             <!-- Review Details Voucher Card -->
             <div class="review-summary-card">
@@ -496,13 +535,13 @@
               </div>
             </div>
 
-            <!-- Buttons for Slide 3 -->
+            <!-- Buttons for Slide 4 -->
             <button class="btn-submit-sky btn-confirm-send" id="btnExecuteSend">
               <i data-lucide="send" style="width: 18px; height: 18px;"></i>
               <span>Send Payment Now</span>
             </button>
 
-            <button class="btn-review-back" id="btnStep3Back">
+            <button class="btn-review-back" id="btnStep4Back">
               <i data-lucide="edit-2" style="width: 15px; height: 15px;"></i>
               <span>Edit Details</span>
             </button>
@@ -638,16 +677,12 @@
       <!-- Action Buttons below the ticket -->
       <div class="ticket-actions-bar">
         <button class="btn-ticket-done" id="btnCloseReceiptModal">
-          <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+          <i data-lucide="check" style="width: 18px; height: 18px;"></i>
           <span>Done</span>
         </button>
-        <button class="btn-ticket-download" id="btnDownloadReceipt">
-          <i data-lucide="download" style="width: 16px; height: 16px;"></i>
-          <span>Download</span>
-        </button>
         <button class="btn-ticket-share" id="btnShareReceipt">
-          <i data-lucide="share-2" style="width: 16px; height: 16px;"></i>
-          <span>Share</span>
+          <i data-lucide="share-2" style="width: 18px; height: 18px;"></i>
+          <span>Share Receipt</span>
         </button>
       </div>
 

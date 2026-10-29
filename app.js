@@ -90,7 +90,20 @@ class TPayPortal {
 
   loadTransactions() {
     const saved = localStorage.getItem("tpay_sufiyan_txs") || localStorage.getItem("tpay_hassan_txs");
-    return saved ? JSON.parse(saved) : [...INITIAL_TRANSACTIONS];
+    if (saved) {
+      try {
+        const txs = JSON.parse(saved);
+        txs.forEach(t => {
+          if (t.date === "Just now") {
+            t.date = "Today, 6:53 PM";
+          }
+        });
+        return txs;
+      } catch (e) {
+        return [...INITIAL_TRANSACTIONS];
+      }
+    }
+    return [...INITIAL_TRANSACTIONS];
   }
 
   saveTransactions() {
@@ -146,32 +159,42 @@ class TPayPortal {
     this.sendWizardTrack = document.getElementById("sendWizardTrack");
     this.sendAvailBalDisplay = document.getElementById("sendAvailBalDisplay");
 
-    // Stepper indicators
+    // Stepper indicators (4 steps)
     this.stepIndicators = [
       document.getElementById("stepIndicator1"),
       document.getElementById("stepIndicator2"),
-      document.getElementById("stepIndicator3")
+      document.getElementById("stepIndicator3"),
+      document.getElementById("stepIndicator4")
     ];
     this.stepConnectors = [
       document.getElementById("stepConnector1"),
-      document.getElementById("stepConnector2")
+      document.getElementById("stepConnector2"),
+      document.getElementById("stepConnector3")
     ];
 
-    // Slide 1 Controls
+    // Slide 1 Controls (Amount)
     this.sendAmountField = document.getElementById("sendAmountField");
     this.btnStep1Next = document.getElementById("btnStep1Next");
 
-    // Slide 2 Controls
+    // Slide 2 Controls (Select Bank)
     this.step2AmountBadge = document.getElementById("step2AmountBadge");
     this.btnEditAmountFromStep2 = document.getElementById("btnEditAmountFromStep2");
     this.sendDestinationBank = document.getElementById("sendDestinationBank");
-    this.sendRecipientName = document.getElementById("sendRecipientName");
-    this.sendRecipientAccount = document.getElementById("sendRecipientAccount");
-    this.sendPurposeSelect = document.getElementById("sendPurposeSelect");
+    this.quickBankBadges = document.querySelectorAll("#quickBankBadges .quick-chip");
     this.btnStep2Back = document.getElementById("btnStep2Back");
     this.btnStep2Next = document.getElementById("btnStep2Next");
 
-    // Slide 3 Controls
+    // Slide 3 Controls (Recipient Details)
+    this.step3BankBadge = document.getElementById("step3BankBadge");
+    this.step3AmountBadge = document.getElementById("step3AmountBadge");
+    this.btnChangeBankFromStep3 = document.getElementById("btnChangeBankFromStep3");
+    this.sendRecipientName = document.getElementById("sendRecipientName");
+    this.sendRecipientAccount = document.getElementById("sendRecipientAccount");
+    this.sendPurposeSelect = document.getElementById("sendPurposeSelect");
+    this.btnStep3Back = document.getElementById("btnStep3Back");
+    this.btnStep3Next = document.getElementById("btnStep3Next");
+
+    // Slide 4 Controls (Review & Confirm)
     this.reviewDispAmount = document.getElementById("reviewDispAmount");
     this.reviewDispRecipient = document.getElementById("reviewDispRecipient");
     this.reviewDispAccount = document.getElementById("reviewDispAccount");
@@ -179,7 +202,7 @@ class TPayPortal {
     this.reviewDispPurpose = document.getElementById("reviewDispPurpose");
     this.reviewDispTotal = document.getElementById("reviewDispTotal");
     this.btnExecuteSend = document.getElementById("btnExecuteSend");
-    this.btnStep3Back = document.getElementById("btnStep3Back");
+    this.btnStep4Back = document.getElementById("btnStep4Back");
 
     // Modals
     this.modalOfficialReceipt = document.getElementById("modalOfficialReceipt");
@@ -195,7 +218,6 @@ class TPayPortal {
     this.receiptDispChannel = document.getElementById("receiptDispChannel");
     this.receiptDispSender = document.getElementById("receiptDispSender");
     this.receiptDestIcon = document.getElementById("receiptDestIcon");
-    this.btnDownloadReceipt = document.getElementById("btnDownloadReceipt");
     this.btnShareReceipt = document.getElementById("btnShareReceipt");
     this.btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
 
@@ -328,6 +350,7 @@ class TPayPortal {
     // Quick Beneficiaries
     document.querySelectorAll("#contactsRow .quick-chip").forEach(chip => {
       chip.addEventListener("click", () => {
+        this.unlockAudio();
         const name = chip.getAttribute("data-name");
         const iban = chip.getAttribute("data-iban");
         const bank = chip.getAttribute("data-bank");
@@ -339,13 +362,18 @@ class TPayPortal {
         }
         if (bank && this.sendDestinationBank) {
           this.sendDestinationBank.value = bank;
-          document.querySelectorAll("#quickBankBadges .quick-chip").forEach(b => {
-            if (b.getAttribute("data-quickbank") === bank) {
-              b.classList.add("active");
-            } else {
-              b.classList.remove("active");
-            }
-          });
+          if (this.quickBankBadges) {
+            this.quickBankBadges.forEach(b => {
+              if (b.getAttribute("data-quickbank") === bank) {
+                b.classList.add("active");
+              } else {
+                b.classList.remove("active");
+              }
+            });
+          }
+          if (this.step3BankBadge) {
+            this.step3BankBadge.textContent = bank;
+          }
         }
       });
     });
@@ -375,7 +403,7 @@ class TPayPortal {
       });
     }
 
-    // Step 1 -> Step 2
+    // Step 1 -> Step 2 (Amount -> Select Bank)
     if (this.btnStep1Next) {
       this.btnStep1Next.addEventListener("click", () => {
         this.unlockAudio();
@@ -393,7 +421,42 @@ class TPayPortal {
       });
     }
 
-    // Step 2 -> Step 1 (Back / Edit)
+    // Step 2 Controls (Select Bank)
+    if (this.quickBankBadges) {
+      this.quickBankBadges.forEach(chip => {
+        chip.addEventListener("click", () => {
+          this.unlockAudio();
+          const selectedBank = chip.getAttribute("data-quickbank");
+          if (selectedBank && this.sendDestinationBank) {
+            this.sendDestinationBank.value = selectedBank;
+          }
+          this.quickBankBadges.forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          if (this.step3BankBadge) {
+            this.step3BankBadge.textContent = selectedBank;
+          }
+        });
+      });
+    }
+
+    if (this.sendDestinationBank) {
+      this.sendDestinationBank.addEventListener("change", () => {
+        const currentBank = this.sendDestinationBank.value;
+        if (this.quickBankBadges) {
+          this.quickBankBadges.forEach(c => {
+            if (c.getAttribute("data-quickbank") === currentBank) {
+              c.classList.add("active");
+            } else {
+              c.classList.remove("active");
+            }
+          });
+        }
+        if (this.step3BankBadge) {
+          this.step3BankBadge.textContent = currentBank;
+        }
+      });
+    }
+
     if (this.btnStep2Back) {
       this.btnStep2Back.addEventListener("click", () => {
         this.unlockAudio();
@@ -407,9 +470,31 @@ class TPayPortal {
       });
     }
 
-    // Step 2 -> Step 3
+    // Step 2 -> Step 3 (Select Bank -> Recipient Details)
     if (this.btnStep2Next) {
       this.btnStep2Next.addEventListener("click", () => {
+        this.unlockAudio();
+        this.goToStep(3);
+      });
+    }
+
+    // Step 3 Controls (Recipient Details)
+    if (this.btnStep3Back) {
+      this.btnStep3Back.addEventListener("click", () => {
+        this.unlockAudio();
+        this.goToStep(2);
+      });
+    }
+    if (this.btnChangeBankFromStep3) {
+      this.btnChangeBankFromStep3.addEventListener("click", () => {
+        this.unlockAudio();
+        this.goToStep(2);
+      });
+    }
+
+    // Step 3 -> Step 4 (Recipient Details -> Confirm & Pay)
+    if (this.btnStep3Next) {
+      this.btnStep3Next.addEventListener("click", () => {
         this.unlockAudio();
         const recipientName = (this.sendRecipientName ? this.sendRecipientName.value.trim() : "");
         const recipientAccount = (this.sendRecipientAccount ? this.sendRecipientAccount.value.trim() : "");
@@ -424,19 +509,19 @@ class TPayPortal {
           if (this.sendRecipientAccount) this.sendRecipientAccount.focus();
           return;
         }
+        this.goToStep(4);
+      });
+    }
+
+    // Step 4 Controls (Review & Confirm)
+    if (this.btnStep4Back) {
+      this.btnStep4Back.addEventListener("click", () => {
+        this.unlockAudio();
         this.goToStep(3);
       });
     }
 
-    // Step 3 -> Step 2 (Back / Edit)
-    if (this.btnStep3Back) {
-      this.btnStep3Back.addEventListener("click", () => {
-        this.unlockAudio();
-        this.goToStep(2);
-      });
-    }
-
-    // Execute Send on Step 3
+    // Execute Send on Step 4
     if (this.btnExecuteSend) {
       this.btnExecuteSend.addEventListener("click", () => {
         this.unlockAudio();
@@ -444,7 +529,7 @@ class TPayPortal {
       });
     }
 
-    // Header Back button dynamically navigates steps
+    // Header Back button dynamically navigates 4 steps
     if (this.btnBackFromSend) {
       this.btnBackFromSend.addEventListener("click", () => {
         this.unlockAudio();
@@ -454,15 +539,9 @@ class TPayPortal {
           this.goToStep(1);
         } else if (this.currentSendStep === 3) {
           this.goToStep(2);
+        } else if (this.currentSendStep === 4) {
+          this.goToStep(3);
         }
-      });
-    }
-
-    // Download Receipt Image Action
-    if (this.btnDownloadReceipt) {
-      this.btnDownloadReceipt.addEventListener("click", () => {
-        this.unlockAudio();
-        this.downloadReceipt();
       });
     }
 
@@ -552,25 +631,38 @@ class TPayPortal {
     if (this.btnBackSendLabel) {
       if (step === 1) this.btnBackSendLabel.textContent = "Dashboard";
       else if (step === 2) this.btnBackSendLabel.textContent = "Amount";
-      else if (step === 3) this.btnBackSendLabel.textContent = "Recipient";
+      else if (step === 3) this.btnBackSendLabel.textContent = "Bank";
+      else if (step === 4) this.btnBackSendLabel.textContent = "Details";
     }
 
     if (this.sendStageTitle) {
       if (step === 1) this.sendStageTitle.textContent = "Send Money";
-      else if (step === 2) this.sendStageTitle.textContent = "Recipient Details";
-      else if (step === 3) this.sendStageTitle.textContent = "Confirm Transfer";
+      else if (step === 2) this.sendStageTitle.textContent = "Select Bank";
+      else if (step === 3) this.sendStageTitle.textContent = "Recipient Details";
+      else if (step === 4) this.sendStageTitle.textContent = "Confirm Transfer";
     }
 
-    // Update details when arriving on Step 2 or 3
     const amt = parseFloat(this.sendAmountField ? this.sendAmountField.value : "0") || 0;
-    if (this.step2AmountBadge) {
-      this.step2AmountBadge.textContent = `₨ ${this.formatCurrency(amt)}`;
+    const bank = (this.sendDestinationBank ? this.sendDestinationBank.value : "Easypaisa");
+
+    if (step === 2) {
+      if (this.step2AmountBadge) {
+        this.step2AmountBadge.textContent = `₨ ${this.formatCurrency(amt)}`;
+      }
     }
 
     if (step === 3) {
+      if (this.step3AmountBadge) {
+        this.step3AmountBadge.textContent = `₨ ${this.formatCurrency(amt)}`;
+      }
+      if (this.step3BankBadge) {
+        this.step3BankBadge.textContent = bank;
+      }
+    }
+
+    if (step === 4) {
       const recipientName = (this.sendRecipientName ? this.sendRecipientName.value.trim() : "") || "TEMOOR SHAH";
       const recipientAccount = (this.sendRecipientAccount ? this.sendRecipientAccount.value.trim() : "") || "0300-8822054";
-      const bank = (this.sendDestinationBank ? this.sendDestinationBank.value : "Easypaisa");
       const purpose = (this.sendPurposeSelect ? this.sendPurposeSelect.value : "Family / Personal Transfer");
 
       if (this.reviewDispAmount) this.reviewDispAmount.textContent = `₨ ${this.formatCurrency(amt)}`;
@@ -810,6 +902,7 @@ class TPayPortal {
       const month = monthNames[now.getMonth()];
       const year = now.getFullYear().toString().slice(-2);
       const formattedTimestamp = `Sent at ${hours}:${minutes} ${ampm} on ${day} ${month} ${year}`;
+      const txDisplayDate = `Today, ${hours}:${minutes} ${ampm}`;
 
       // Add to transaction feed
       const newTx = {
@@ -817,7 +910,7 @@ class TPayPortal {
         title: `Transfer to ${recipientName.toUpperCase()}`,
         type: "send",
         amount: `-${this.formatCurrency(amount)}`,
-        date: "Just now",
+        date: txDisplayDate,
         meta: `${bank} • Raast Instant`
       };
       this.transactions.unshift(newTx);
@@ -1025,6 +1118,12 @@ class TPayPortal {
         <circle cx="14" cy="14" r="13" fill="#DC2626"/>
         <path d="M14 6L21 11V13H7V11L14 6ZM9 14H11V19H9V14ZM13 14H15V19H13V14ZM17 14H19V19H17V14ZM7 20H21V22H7V20Z" fill="#FFFFFF"/>
       </svg>`;
+    } else if (bank.includes("payvay") || bank.includes("payway")) {
+      return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#4F46E5"/>
+        <path d="M8.5 10L14 20L19.5 10H16.5L14 15.5L11.5 10H8.5Z" fill="#FFFFFF"/>
+        <circle cx="14" cy="9" r="2.2" fill="#38BDF8"/>
+      </svg>`;
     }
     return `<svg width="26" height="26" viewBox="0 0 28 28" fill="none">
       <circle cx="14" cy="14" r="13" fill="#0284C7"/>
@@ -1053,355 +1152,6 @@ class TPayPortal {
     }
   }
 
-  // --- Download Receipt Image ---
-  async downloadReceipt() {
-    const voucher = document.getElementById("officialVoucher");
-    const ref = (this.receiptDispRef && this.receiptDispRef.textContent.trim()) || "TPay";
-    const filename = `TPay_Receipt_${ref}.png`;
-
-    const originalBtnHtml = this.btnDownloadReceipt ? this.btnDownloadReceipt.innerHTML : "";
-    if (this.btnDownloadReceipt) {
-      this.btnDownloadReceipt.disabled = true;
-      this.btnDownloadReceipt.innerHTML = `
-        <svg class="spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-        <span>Saving...</span>
-      `;
-    }
-
-    this.notify("Preparing receipt download...");
-
-    let success = false;
-
-    // Attempt html2canvas first if loaded
-    if (window.html2canvas && voucher) {
-      try {
-        const canvas = await window.html2canvas(voucher, {
-          scale: 3, // Ultra-sharp 3x resolution
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: "#FFFFFF",
-          logging: false,
-          onclone: (clonedDoc) => {
-            const clonedVoucher = clonedDoc.getElementById("officialVoucher");
-            if (clonedVoucher) {
-              clonedVoucher.style.transform = "none";
-              clonedVoucher.style.boxShadow = "none";
-            }
-          }
-        });
-
-        if (canvas && canvas.width > 0 && canvas.height > 0) {
-          this.triggerCanvasDownload(canvas, filename);
-          this.notify("✅ Receipt downloaded!");
-          success = true;
-        }
-      } catch (err) {
-        console.warn("html2canvas render error, using Canvas 2D fallback:", err);
-      }
-    }
-
-    // Fallback: Offline pure Canvas 2D engine
-    if (!success) {
-      try {
-        const fallbackCanvas = this.renderFallbackReceiptCanvas();
-        this.triggerCanvasDownload(fallbackCanvas, filename);
-        this.notify("✅ Receipt saved successfully!");
-        success = true;
-      } catch (fallbackErr) {
-        console.error("Canvas 2D fallback error:", fallbackErr);
-        window.print();
-        this.notify("Print dialog opened");
-      }
-    }
-
-    this.resetDownloadBtn(originalBtnHtml);
-  }
-
-  resetDownloadBtn(originalHtml) {
-    if (this.btnDownloadReceipt) {
-      this.btnDownloadReceipt.disabled = false;
-      this.btnDownloadReceipt.innerHTML = originalHtml;
-      if (window.lucide) {
-        lucide.createIcons();
-      }
-    }
-  }
-
-  triggerCanvasDownload(canvas, filename) {
-    if (canvas.toBlob) {
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          this.downloadViaDataUrl(canvas, filename);
-          return;
-        }
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl);
-        }, 300);
-      }, "image/png");
-    } else {
-      this.downloadViaDataUrl(canvas, filename);
-    }
-  }
-
-  downloadViaDataUrl(canvas, filename) {
-    const dataUrl = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-    }, 300);
-  }
-
-  // --- Pure HTML5 Canvas 2D Fallback Receipt Generator ---
-  renderFallbackReceiptCanvas() {
-    const width = 420;
-    const height = 580;
-    const scale = 2;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = width * scale;
-    canvas.height = height * scale;
-    const ctx = canvas.getContext("2d");
-    ctx.scale(scale, scale);
-
-    const drawRoundedRect = (c, x, y, w, h, r) => {
-      if (c.roundRect) {
-        c.beginPath();
-        c.roundRect(x, y, w, h, r);
-      } else {
-        c.beginPath();
-        c.moveTo(x + r, y);
-        c.lineTo(x + w - r, y);
-        c.quadraticCurveTo(x + w, y, x + w, y + r);
-        c.lineTo(x + w, y + h - r);
-        c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        c.lineTo(x + r, y + h);
-        c.quadraticCurveTo(x, y + h, x, y + h - r);
-        c.lineTo(x, y + r);
-        c.quadraticCurveTo(x, y, x + r, y);
-        c.closePath();
-      }
-    };
-
-    // Background
-    ctx.fillStyle = "#F8FAFC";
-    ctx.fillRect(0, 0, width, height);
-
-    // Voucher Card
-    const cardX = 20;
-    const cardY = 16;
-    const cardW = width - 40;
-    const cardH = height - 32;
-    const r = 24;
-
-    ctx.save();
-    ctx.fillStyle = "#FFFFFF";
-    ctx.strokeStyle = "#E2E8F0";
-    ctx.lineWidth = 1.5;
-    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, r);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // Halo & Checkmark Circle
-    const cx = width / 2;
-    const cy = cardY + 54;
-
-    // Halo outer circle
-    ctx.fillStyle = "rgba(99, 85, 216, 0.12)";
-    ctx.beginPath();
-    ctx.arc(cx, cy, 26, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Inner solid circle
-    ctx.fillStyle = "#6355D8";
-    ctx.beginPath();
-    ctx.arc(cx, cy, 18, 0, Math.PI * 2);
-    ctx.fill();
-
-    // White checkmark
-    ctx.strokeStyle = "#FFFFFF";
-    ctx.lineWidth = 3.5;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    ctx.moveTo(cx - 7, cy);
-    ctx.lineTo(cx - 2, cy + 5);
-    ctx.lineTo(cx + 8, cy - 5);
-    ctx.stroke();
-
-    // Amount
-    const amtText = (this.receiptDispAmount && this.receiptDispAmount.textContent.trim()) || "Rs. 260";
-    ctx.fillStyle = "#0F172A";
-    ctx.font = "800 32px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(amtText, cx, cardY + 116);
-
-    // Timestamp
-    const timeText = (this.receiptDispTime && this.receiptDispTime.textContent.trim()) || "Sent just now";
-    ctx.fillStyle = "#64748B";
-    ctx.font = "600 12.5px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
-    ctx.fillText(timeText, cx, cardY + 138);
-
-    // Perforation Divider with Notches & Dots
-    const notchY = cardY + 172;
-
-    // Notches (cutouts on card edges)
-    ctx.fillStyle = "#F8FAFC";
-    ctx.beginPath();
-    ctx.arc(cardX, notchY, 11, -Math.PI / 2, Math.PI / 2, false);
-    ctx.fill();
-    ctx.strokeStyle = "#E2E8F0";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(cardX, notchY, 11, -Math.PI / 2, Math.PI / 2, false);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(cardX + cardW, notchY, 11, Math.PI / 2, -Math.PI / 2, false);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cardX + cardW, notchY, 11, Math.PI / 2, -Math.PI / 2, false);
-    ctx.stroke();
-
-    // Dotted line across notches
-    ctx.fillStyle = "#111827";
-    const dotStartX = cardX + 22;
-    const dotEndX = cardX + cardW - 22;
-    const numDots = 20;
-    const step = (dotEndX - dotStartX) / (numDots - 1);
-    for (let i = 0; i < numDots; i++) {
-      ctx.beginPath();
-      ctx.arc(dotStartX + i * step, notchY, 1.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Two Column Boxes (From & To)
-    const boxY = notchY + 22;
-    const boxW = (cardW - 44) / 2;
-    const boxH = 68;
-
-    // From Box
-    const fromX = cardX + 16;
-    ctx.fillStyle = "#F8FAFC";
-    ctx.strokeStyle = "#E2E8F0";
-    ctx.lineWidth = 1;
-    drawRoundedRect(ctx, fromX, boxY, boxW, boxH, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    // From Label
-    ctx.fillStyle = "#64748B";
-    ctx.font = "700 11px system-ui, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("From", fromX + 10, boxY + 18);
-
-    // From Name & Account
-    const senderName = (this.receiptDispSender && this.receiptDispSender.textContent.trim()) || "Sufiyan Ali";
-    ctx.fillStyle = "#0F172A";
-    ctx.font = "800 12.5px system-ui, sans-serif";
-    ctx.fillText(senderName, fromX + 10, boxY + 38);
-    ctx.fillStyle = "#475569";
-    ctx.font = "600 11px system-ui, sans-serif";
-    ctx.fillText("*2009", fromX + 10, boxY + 54);
-
-    // To Box
-    const toX = fromX + boxW + 12;
-    ctx.fillStyle = "#F8FAFC";
-    ctx.strokeStyle = "#E2E8F0";
-    ctx.lineWidth = 1;
-    drawRoundedRect(ctx, toX, boxY, boxW, boxH, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    // To Label
-    ctx.fillStyle = "#64748B";
-    ctx.font = "700 11px system-ui, sans-serif";
-    ctx.fillText("To", toX + 10, boxY + 18);
-
-    // To Name & Account
-    const toName = (this.receiptDispRecipient && this.receiptDispRecipient.textContent.trim()) || "Beneficiary";
-    const toAcct = (this.receiptDispAccount && this.receiptDispAccount.textContent.trim()) || "*0000";
-    ctx.fillStyle = "#0F172A";
-    ctx.font = "800 12.5px system-ui, sans-serif";
-    const truncatedTo = toName.length > 15 ? toName.slice(0, 14) + "…" : toName;
-    ctx.fillText(truncatedTo, toX + 10, boxY + 38);
-    ctx.fillStyle = "#475569";
-    ctx.font = "600 11px system-ui, sans-serif";
-    ctx.fillText(toAcct, toX + 10, boxY + 54);
-
-    // Details Rows
-    const detailsY = boxY + boxH + 26;
-    const refVal = (this.receiptDispRef && this.receiptDispRef.textContent.trim()) || "488274323";
-    const chanVal = (this.receiptDispChannel && this.receiptDispChannel.textContent.trim()) || "Raast";
-
-    // Row 1: Transaction ID
-    ctx.fillStyle = "#64748B";
-    ctx.font = "600 12px system-ui, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("Transaction ID", cardX + 20, detailsY);
-    ctx.fillStyle = "#0F172A";
-    ctx.font = "700 12px system-ui, sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(refVal, cardX + cardW - 20, detailsY);
-
-    // Row 2: Transaction Channel
-    ctx.fillStyle = "#64748B";
-    ctx.font = "600 12px system-ui, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("Transaction Channel", cardX + 20, detailsY + 26);
-    ctx.fillStyle = "#0F172A";
-    ctx.font = "700 12px system-ui, sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(chanVal, cardX + cardW - 20, detailsY + 26);
-
-    // Bottom Divider
-    const footY = detailsY + 54;
-    ctx.strokeStyle = "#E2E8F0";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cardX + 20, footY);
-    ctx.lineTo(cardX + cardW - 20, footY);
-    ctx.stroke();
-
-    // Footer: Processed Securely By | RAQAMI ISLAMIC DIGITAL BANK
-    ctx.fillStyle = "#64748B";
-    ctx.font = "700 9px system-ui, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("PROCESSED", cardX + 22, footY + 22);
-    ctx.fillText("SECURELY BY", cardX + 22, footY + 34);
-
-    // Divider
-    ctx.strokeStyle = "#CBD5E1";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cardX + 96, footY + 12);
-    ctx.lineTo(cardX + 96, footY + 44);
-    ctx.stroke();
-
-    // RAQAMI Brand Text
-    ctx.fillStyle = "#1E293B";
-    ctx.font = "900 13px system-ui, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("RAQAMI", cardX + 108, footY + 24);
-
-    ctx.fillStyle = "#00A389";
-    ctx.font = "800 7.5px system-ui, sans-serif";
-    ctx.fillText("ISLAMIC DIGITAL BANK", cardX + 108, footY + 38);
-
-    return canvas;
-  }
-
   // --- Share / Copy Receipt ---
   shareReceipt() {
     const amt = this.receiptDispAmount ? this.receiptDispAmount.textContent : "Rs. 260";
@@ -1419,7 +1169,11 @@ class TPayPortal {
     if (navigator.share) {
       navigator.share(shareData).catch((err) => {
         if (err.name !== 'AbortError') {
-          this.downloadReceipt();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareData.text).then(() => {
+              this.notify("Receipt details copied to clipboard!");
+            });
+          }
         }
       });
     } else if (navigator.clipboard && navigator.clipboard.writeText) {
